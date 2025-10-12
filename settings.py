@@ -34,3 +34,4 @@ mixer.music.load('brackeys_platformer_assets/music/game_level_music.wav')
 mixer.music.play()
 volume = mixer.music.get_volume()
 mixer.music.set_volume(volume - 0.5) # test option
+mixer.music.play(-1) # loop forever

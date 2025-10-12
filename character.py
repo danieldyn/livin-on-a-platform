@@ -3,8 +3,6 @@
 import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
 from settings import screen, coin_sound
-from worlds import world_level_01
-from objects import obj_list
 
 class Player():
         def __init__(self, x, y):
@@ -37,7 +35,7 @@ class Player():
                         image = (img, img_rect, player_mask)
                         list_of_images.append(image)
 
-        def update(self):
+        def update(self, level_world): # the player must be functional in any level
                 # movement
                 dx = 0
                 dy = self.player_gravity
@@ -83,7 +81,7 @@ class Player():
 
                 # collision
 
-                for block in world_level_01.block_list:
+                for block in level_world.block_list:
                         block_rect = block[1] # the rect of the block
                         block_mask = block[2] # the mask of the block
 
@@ -136,7 +134,7 @@ class Player():
                 
                 # check if the player "collected" an object
 
-                for obj in obj_list:
+                for obj in level_world.obj_list:
                         for img in obj.object_img_list:
                                 obj_mask = img[2]
                                 # print((self.player_rect.x, self.player_rect.y))

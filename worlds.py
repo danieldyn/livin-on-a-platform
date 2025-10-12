@@ -6,8 +6,10 @@ import objects
 
 class World():
         def __init__(self):
+                # every world has an object list and block list
                 self.block_list = []
-                self.coin_list = []
+                self.obj_list = []
+
                 self.world_data = []
 
         def get_world_data(self, file_path):
@@ -57,7 +59,7 @@ class World():
                                         coin_y = BLOCK_SIZE * row_count
                                         coin = objects.Object('brackeys_platformer_assets/sprites/coin.png', coin_x, coin_y)
                                         coin.get_obj_img(16, 16, (0, 0, 0), 1, 12, coin.object_img_list)
-                                        objects.obj_list.append(coin)
+                                        self.obj_list.append(coin)
                                 col_count += 1
                         row_count += 1
 
@@ -70,7 +72,7 @@ class World():
 def create_world(path_to_world_data):
         world = World() # new world
         world.get_world_data(path_to_world_data) # get data
-        world.get_block_list(world.world_data) # get blocks
+        world.get_block_list(world.world_data) # get blocks (and objects)
         return world
 
 # main menu

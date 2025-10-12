@@ -30,6 +30,3 @@ class Object():
                 self.object_img_index = 0
             obj_surface = self.object_img_list[int(self.object_img_index)][0]
             screen.blit(obj_surface, self.obj_rect)
-        
-
-obj_list = []

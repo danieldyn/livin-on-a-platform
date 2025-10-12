@@ -23,6 +23,19 @@ Insane things:
 - item store (power-ups)
 - bonus level (as wild as possible)
 
+## Level Structure
+
+> There is only one **Player** instance that progresses from level to level, retaining its stats from the previous level.
+
+- **Player**
+    - **Level**
+        - **World**
+            - **Object list** (e.g., coins, fruits, …)
+            - **Block list** (e.g., grass, dirt, water, …)
+        - **background image**
+
+> When a new **Level** object is created, it is assigned a **World** (which contains the object and block lists) and a **background image**, allowing for easier design and management of separate levels.
+
 ## Playing the Game
 
 Running the game requires the module `pygame`, which is not a standard one.

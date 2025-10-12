@@ -1,9 +1,7 @@
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, LOSS_SCREEN_DURATION,  screen, loss_sound, mixer
 from character import player
-from objects import obj_list
 from worlds import world_main_menu, world_level_01
-
 
 class Level():
         def __init__(self, bg_img, world):
@@ -11,8 +9,10 @@ class Level():
                 # background
                 bg_surf = pygame.image.load(bg_img)
                 self.bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
-                # world map
+
+                # every level has a world
                 self.world = world
+
                 # timer start
                 self.clock = pygame.time.Clock()
                 # player info
@@ -26,14 +26,14 @@ class Level():
                 self.world.draw()
 
         def display_player(self):
-                player.update()
+                player.update(self.world)
                 if player.player_rect.y >= SCREEN_HEIGHT:
                         self.player_is_alive = False
                 else:
                         self.player_is_alive = True
         
         def display_objects(self):
-                for obj in obj_list:
+                for obj in self.world.obj_list:
                         obj.obj_animation()
 
         def display_score(self):
@@ -82,7 +82,7 @@ class Level():
                 time_rect = time_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60))
 
                 #restart_button = Button(400, 400, "Try Again")
-                #restart_button.get_img(1, "button_images_01", 5, "png") 
+                #restart_button.get_img("button_images_01", 5, "png") 
 
                 screen.blit(fallen_surf, fallen_rect)
                 screen.blit(score_surf, score_rect)

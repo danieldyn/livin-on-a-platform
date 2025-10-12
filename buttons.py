@@ -13,10 +13,13 @@ class Button():
         self.was_pressed = 0
         self.text_on_button = text_on_buttom
 
-    def get_img(self, scale, directory, number_of_image_files, image_file_type):
+    def get_img(self, directory, number_of_image_files, image_file_type):
         for i in range(1, number_of_image_files + 1):
             img_surf = pygame.image.load(f"buttons/{directory}/img{i:02}.{image_file_type}").convert_alpha()
-            img_surf = pygame.transform.scale(img_surf, (self.button_width * scale, self.button_height * scale))
+            # scale 
+            # img_surf = pygame.transform.scale(img_surf, (self.button_width * scale, self.button_height * scale))
+            # self.button_width = self.button_width * scale
+            # self.button_height = self.button_height * scale
             img_mask = pygame.mask.from_surface(img_surf)
             img_rect = img_surf.get_rect()
 

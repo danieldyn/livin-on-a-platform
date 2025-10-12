@@ -3,6 +3,7 @@ from settings import FPS, MAIN_MENU
 from buttons import Button
 from levels import main_menu, level1
 
+
 pygame.init()
 
 #class Game():
@@ -15,7 +16,7 @@ pygame.init()
 running = True
 
 start_button = Button(400, 400, "Start") # test coordinates (will change for final main menu)
-start_button.get_img(1, "button_images_01", 5, "png")
+start_button.get_img("button_images_01", 5, "png")
 
 
 while running:
@@ -35,6 +36,7 @@ while running:
 
         if MAIN_MENU == True:
                 main_menu.display_world()
+                
                 # will add idle player (animation) on main menu, on some surface
                 # main_menu.display_player()
                 start_button.update()
