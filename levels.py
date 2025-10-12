@@ -1,7 +1,6 @@
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, LOSS_SCREEN_DURATION, FPS, screen, loss_sound, mixer
 from character import player
-from objects import obj_list
 from worlds import world_main_menu
 
 class Level():
@@ -26,7 +25,7 @@ class Level():
                 player.reset()
                 mixer.music.rewind()
                 mixer.music.play()
-                for obj in obj_list:
+                for obj in self.world.obj_list:
                         obj.object_shown = True
 
         def display_world(self):

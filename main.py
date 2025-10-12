@@ -13,8 +13,8 @@ pygame.init()
 #                self.gameover = False
 #                self.run()
 
-start_button = Button(400, 400, "Start") # test coordinates (will change for final main menu)
-start_button.get_img("button_images_01", 5, "png")
+start_button = Button(400, 700, "Start") # test coordinates (will change for final main menu)
+start_button.get_img(1, "button_images_01", 5, "png")
 
 running = True
 level1 = None # initialise before loop

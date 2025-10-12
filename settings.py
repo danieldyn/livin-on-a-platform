@@ -27,4 +27,3 @@ coin_sound = mixer.Sound('brackeys_platformer_assets/sounds/coin.wav') # two opt
 mixer.music.load('brackeys_platformer_assets/music/game_level_music.wav')
 volume = mixer.music.get_volume()
 mixer.music.set_volume(volume - 0.5) # test option
-mixer.music.play(-1) # loop forever
