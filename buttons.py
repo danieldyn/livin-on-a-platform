@@ -48,9 +48,3 @@ class Button():
             screen.blit(self.button_img_list[int(self.button_image_index)][0], self.button_rect)
         else:
             screen.blit(self.button_img_list[0][0], self.button_rect)
-
-
-
-
-
-            
