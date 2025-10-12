@@ -13,7 +13,12 @@ class Button():
         self.was_pressed = 0
         self.text_on_button = text_on_buttom
 
-    def get_img(self, directory, number_of_image_files, image_file_type):
+    def reset(self):
+        self.was_pressed = 0
+        self.can_press_button = 1
+        self.button_image_index = 0
+
+    def get_img(self, scale, directory, number_of_image_files, image_file_type):
         for i in range(1, number_of_image_files + 1):
             img_surf = pygame.image.load(f"buttons/{directory}/img{i:02}.{image_file_type}").convert_alpha()
             # scale 

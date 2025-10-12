@@ -67,7 +67,14 @@ class World():
                 for block in self.block_list:
                         screen.blit(block[0], block[1])
                         # Keep this commented unless you want to debug the screen layout
-                        # pygame.draw.rect(screen, (255, 255, 255), block[1], 1) 
+                        # pygame.draw.rect(screen, (255, 255, 255), block[1], 1)
+
+# Keep this commented unless you want to debug the screen layout
+        # def draw_grid():
+        #         for line in range(0, 73):
+        #                 pygame.draw.line(screen, (0, 0, 0), (0, line * block_size), (screen_width, line * block_size))
+        #                 pygame.draw.line(screen, (0, 0, 0), (line * block_size, 0), (line * block_size, screen_height))
+        #draw_grid()
 
 def create_world(path_to_world_data):
         world = World() # new world

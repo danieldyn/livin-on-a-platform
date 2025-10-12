@@ -9,7 +9,6 @@
 > Describe what happens
 
 - **main menu** (animated play and quit buttons)
-- **level timer**
 - **loss menu**
 - **background decorations** (trees, etc)
 - coin sound to become self.object sound

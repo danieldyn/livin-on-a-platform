@@ -11,12 +11,6 @@ IDLE_IMAGE_INCREMENT = 0.1
 OBJECT_IMAGE_INCREMENT = 0.1
 BUTTON_IMAGE_INCREMENT = 0.35
 
-# Level and main menu settings
-
-MAIN_MENU = True
-
-
-
 # screen setup
 from pygame import display
 screen = display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -31,7 +25,6 @@ coin_sound = mixer.Sound('brackeys_platformer_assets/sounds/coin.wav') # two opt
 
 # background music for levels
 mixer.music.load('brackeys_platformer_assets/music/game_level_music.wav')
-mixer.music.play()
 volume = mixer.music.get_volume()
 mixer.music.set_volume(volume - 0.5) # test option
 mixer.music.play(-1) # loop forever
