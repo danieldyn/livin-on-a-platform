@@ -9,8 +9,10 @@ class World():
                 # every world has an object list and block list
                 self.block_list = []
                 self.obj_list = []
-
                 self.world_data = []
+                # dangerous blocks will harm you (you will lose a heart)
+                self.dangerous_blocks_list = []
+                
 
         def get_world_data(self, file_path):
                 with open(file_path) as file:
@@ -21,6 +23,7 @@ class World():
                 grass_img = pygame.image.load('ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable1.png')
                 dirt_img = pygame.image.load('ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable4.png')
                 water_img = pygame.image.load('ClassicPlatformerAssets/Water/water.png')
+                spike_img = pygame.image.load('ClassicPlatformerAssets/Props/spikes.png')
 
                 row_count = 0
                 for row in grid:
@@ -60,6 +63,15 @@ class World():
                                         coin = objects.Object('brackeys_platformer_assets/sprites/coin.png', coin_x, coin_y)
                                         coin.get_obj_img(16, 16, (0, 0, 0), 1, 12, coin.object_img_list)
                                         self.obj_list.append(coin)
+                                if block == 5:
+                                        # spike block
+                                        image = pygame.transform.scale(spike_img, (BLOCK_SIZE, BLOCK_SIZE))
+                                        spike_rect = image.get_rect()
+                                        spike_rect.x = BLOCK_SIZE * col_count
+                                        spike_rect.y = BLOCK_SIZE * row_count
+                                        spike_mask = pygame.mask.from_surface(image)
+                                        img = (image, spike_rect, spike_mask)
+                                        self.dangerous_blocks_list.append(img)
                                 col_count += 1
                         row_count += 1
 
@@ -68,6 +80,9 @@ class World():
                         screen.blit(block[0], block[1])
                         # Keep this commented unless you want to debug the screen layout
                         # pygame.draw.rect(screen, (255, 255, 255), block[1], 1)
+                for dangerous_blocks in self.dangerous_blocks_list:
+                        screen.blit(dangerous_blocks[0], dangerous_blocks[1])
+
 
 # Keep this commented unless you want to debug the screen layout
         # def draw_grid():

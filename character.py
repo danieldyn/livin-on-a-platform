@@ -14,15 +14,19 @@ class Player():
                 self.running_img_index = 0
                 self.idle_img_index = 0
                 self.rolling_img_index = 0
+                # image lists
                 self.running_img_list = []
                 self.rolling_img_list = []
                 self.idle_image_list = []
+                self.death_img_list = []
+
                 self.img = pygame.image.load('brackeys_platformer_assets/sprites/knight.png').convert_alpha()
                 self.player_rect = pygame.rect.Rect(self.starting_x, self.starting_y, self.player_width, self.player_height)
                 self.can_jump = True
                 self.player_is_rolling = False
                 self.coins_collected = 0
                 self.jump_sound = pygame.mixer.Sound('brackeys_platformer_assets/sounds/jump.wav')
+                self.player_is_alive = True
 
         def reset(self):
                 self.player_rect.topleft = (self.starting_x, self.starting_y)
@@ -113,45 +117,66 @@ class Player():
                                         dy = 0
                                         self.player_gravity = 0
 
-                # checking if player is idle
+                # print(level_world.dangerous_blocks_list)
 
-                img_frame = pygame.surface.Surface((0, 0))
+                for danger_block in level_world.dangerous_blocks_list:
+                        danger_block_rect = danger_block[1]
+                        danger_block_mask : pygame.Mask = danger_block[2]
 
-                if dx == 0 and dy == 0:
-                        self.running_img_index = 0 # start running animation from beginning after idle state
-                        self.idle_img_index += IDLE_IMAGE_INCREMENT
-                        if self.idle_img_index >= len(self.idle_image_list):
-                                self.idle_img_index = 0
-                        img_frame = self.idle_image_list[int(self.idle_img_index)][0] # the surface
-                else:   
-                        if self.player_is_rolling == True:
-                                img_frame = self.rolling_img_list[int(self.rolling_img_index)][0] # the surface
+                        # hitting the block
+                        if img_mask.overlap(danger_block_mask, (danger_block_rect.x - self.player_rect.x, block_rect.y - (self.player_rect.y + dy))) or img_mask.overlap(danger_block_mask, (danger_block_rect.x - (self.player_rect.x + dx), danger_block_rect.y - self.player_rect.y)):
+                                self.player_is_alive = False
+                                # print("OH NO")
+
+                if self.player_is_alive == True:
+
+                        # checking if player is idle
+                        img_frame = pygame.surface.Surface((0, 0))
+
+                        if dx == 0 and dy == 0:
+                                self.running_img_index = 0 # start running animation from beginning after idle state
+                                self.idle_img_index += IDLE_IMAGE_INCREMENT
+                                if self.idle_img_index >= len(self.idle_image_list):
+                                        self.idle_img_index = 0
+                                img_frame = self.idle_image_list[int(self.idle_img_index)][0] # the surface
+                        else:   
+                                if self.player_is_rolling == True:
+                                        img_frame = self.rolling_img_list[int(self.rolling_img_index)][0] # the surface
+                                else:
+                                        img_frame = self.running_img_list[int(self.running_img_index)][0] # the surface                
+                                
+                                if dx < 0: # moving left
+                                        img_frame = pygame.transform.flip(img_frame, True, False).convert_alpha()
+                                
+                                self.player_rect.y += dy
+                                self.player_rect.x += dx
+
+                        # check is player is on screen (after possible movement)
+                        if player.player_rect.y >= SCREEN_HEIGHT:
+                                player.player_is_alive = False
                         else:
-                                img_frame = self.running_img_list[int(self.running_img_index)][0] # the surface                
+                                player.player_is_alive = True
+
+                        # Keep this commented unless you want to debug the player's hitbox range
+                        #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
                         
-                        if dx < 0: # moving left
-                                img_frame = pygame.transform.flip(img_frame, True, False).convert_alpha()
+                        # check if the player "collected" an object
+
+                        for obj in level_world.obj_list:
+                                for img in obj.object_img_list:
+                                        obj_mask = img[2]
+                                        # print((self.player_rect.x, self.player_rect.y))
+                                        if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - self.player_rect.y)):
+                                                if obj.object_shown == True:
+                                                        coin_sound.play()
+                                                        self.coins_collected += 1 # avoid point farming after collecting the coin
+                                                obj.object_shown = False # remove the object from screen
+                                                
+
+                        screen.blit(img_frame, self.player_rect)
+                else:
+                        pass
                         
-                        self.player_rect.y += dy
-                        self.player_rect.x += dx
-
-                # Keep this commented unless you want to debug the player's hitbox range
-                #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
-                
-                # check if the player "collected" an object
-
-                for obj in level_world.obj_list:
-                        for img in obj.object_img_list:
-                                obj_mask = img[2]
-                                # print((self.player_rect.x, self.player_rect.y))
-                                if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - self.player_rect.y)):
-                                        if obj.object_shown == True:
-                                                coin_sound.play()
-                                                self.coins_collected += 1 # avoid point farming after collecting the coin
-                                        obj.object_shown = False # remove the object from screen
-                                        
-
-                screen.blit(img_frame, self.player_rect)
 
 # player
 player = Player(7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
@@ -161,3 +186,5 @@ player.get_img(player.img, 32, 32, (0, 0, 0), 3, 8, player.running_img_list)
 player.get_img(player.img, 32, 32, (0, 0, 0), 6, 8, player.rolling_img_list)
 # getting idle images
 player.get_img(player.img, 32, 32, (0, 0, 0), 1, 4, player.idle_image_list)
+# death animation
+player.get_img(player.img, 32, 32, (0, 0, 0), 8, 4, player.death_img_list)

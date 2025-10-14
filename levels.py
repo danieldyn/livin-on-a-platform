@@ -17,11 +17,11 @@ class Level():
                 # timer start
                 self.start_time = pygame.time.get_ticks()
                 # player info
-                self.player_is_alive = False
+                # self.player_is_alive = False
 
         def reset(self):
                 self.start_time = pygame.time.get_ticks()
-                self.player_is_alive = True
+                player.player_is_alive = True
                 player.reset()
                 mixer.music.rewind()
                 mixer.music.play()
@@ -34,10 +34,6 @@ class Level():
 
         def display_player(self):
                 player.update(self.world)
-                if player.player_rect.y >= SCREEN_HEIGHT:
-                        self.player_is_alive = False
-                else:
-                        self.player_is_alive = True
         
         def display_objects(self):
                 for obj in self.world.obj_list:
@@ -124,7 +120,7 @@ class Level():
                 self.display_objects() # layer 2
                 # layer 3 (player layer)
                 self.display_player()
-                if self.player_is_alive == False: # if player is dead
+                if player.player_is_alive == False: # if player is dead
                         self.display_fallen(pygame.time.get_ticks() - self.start_time)
                 else: 
                         self.display_score() # layer 4
