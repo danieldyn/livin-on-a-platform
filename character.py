@@ -11,9 +11,11 @@ class Player():
                 self.player_gravity = -15
                 self.player_width = 48
                 self.player_height = 48
+                # index for animation
                 self.running_img_index = 0
                 self.idle_img_index = 0
                 self.rolling_img_index = 0
+                self.death_img_index = 0
                 # image lists
                 self.running_img_list = []
                 self.rolling_img_list = []
@@ -176,7 +178,6 @@ class Player():
                         screen.blit(img_frame, self.player_rect)
                 else:
                         pass
-                        
 
 # player
 player = Player(7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)

@@ -67,7 +67,7 @@ class Level():
                 screen.blit(time_surf, time_rect)
 
         def display_fallen(self, time):
-                pygame.time.delay(250) # avoid making the transition very sudden
+                pygame.time.delay(400) # avoid making the transition very sudden
                 bg_surf = pygame.image.load('backgrounds/fallen_menu.jpg')
                 bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg_surf, (0, 0))
@@ -110,6 +110,14 @@ class Level():
 
                 # quit to the main menu
                 self.running = False
+        
+        def display_death(self):
+                player.death_img_index += 0.1
+                if player.death_img_index >= len(player.death_img_list):
+                        player.death_img_index = 0
+                        self.display_fallen(pygame.time.get_ticks() - self.start_time)
+                img_frame = player.death_img_list[int(player.death_img_index)][0] # the surface
+                screen.blit(img_frame, player.player_rect)
 
         def display_update(self):
                 pygame.display.update()
@@ -121,7 +129,9 @@ class Level():
                 # layer 3 (player layer)
                 self.display_player()
                 if player.player_is_alive == False: # if player is dead
-                        self.display_fallen(pygame.time.get_ticks() - self.start_time)
+                        self.display_death() # this will still display the fallen screen
+                        self.display_update()
+                        # self.display_fallen(pygame.time.get_ticks() - self.start_time)
                 else: 
                         self.display_score() # layer 4
                         self.display_time() # layer 5
