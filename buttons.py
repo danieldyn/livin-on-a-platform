@@ -3,15 +3,15 @@ from settings import screen
 from settings import BUTTON_IMAGE_INCREMENT
 
 class Button():
-    def __init__(self, x, y, text_on_buttom):
-        self.button_img_list = [] # for now all Buttom objects have the same "animation" 
+    def __init__(self, x, y, text_on_button):
+        self.button_img_list = [] # for now all Button objects have the same "animation" 
         self.button_width = 144 # same dimensions as the unscaled picture (for now)
         self.button_height = 72
         self.button_rect = pygame.rect.Rect(x, y, self.button_width, self.button_height)
         self.can_press_button = True
         self.button_image_index = 0
         self.was_pressed = 0
-        self.text_on_button = text_on_buttom
+        self.text_on_button = text_on_button
 
     def reset(self):
         self.was_pressed = 0
@@ -21,7 +21,7 @@ class Button():
     def get_img(self, scale, directory, number_of_image_files, image_file_type):
         for i in range(1, number_of_image_files + 1):
             img_surf = pygame.image.load(f"buttons/{directory}/img{i:02}.{image_file_type}").convert_alpha()
-            # scale 
+            # scale
             # img_surf = pygame.transform.scale(img_surf, (self.button_width * scale, self.button_height * scale))
             # self.button_width = self.button_width * scale
             # self.button_height = self.button_height * scale

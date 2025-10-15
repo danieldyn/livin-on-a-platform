@@ -2,25 +2,21 @@ import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, LOSS_SCREEN_DURATION, FPS, screen, loss_sound, mixer
 from character import player
 from worlds import world_main_menu
+from buttons import Button
 
 class Level():
         def __init__(self, bg_img, world):
                 self.running = True
-                # background
                 bg_surf = pygame.image.load(bg_img)
                 self.bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
-                # every level has a world
                 self.world = world
-                # the clock
                 self.clock = pygame.time.Clock()
-                # timer start
                 self.start_time = pygame.time.get_ticks()
-                # player info
-                # self.player_is_alive = False
+                self.displaying_fallen = False
 
         def reset(self):
                 self.start_time = pygame.time.get_ticks()
+                self.displaying_fallen = False
                 player.player_is_alive = True
                 player.reset()
                 mixer.music.rewind()
@@ -67,20 +63,19 @@ class Level():
                 screen.blit(time_surf, time_rect)
 
         def display_fallen(self, time):
+                self.displaying_fallen = True
                 pygame.time.delay(400) # avoid making the transition very sudden
-                bg_surf = pygame.image.load('backgrounds/fallen_menu.jpg')
-                bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
-                screen.blit(bg_surf, (0, 0))
-
+                
                 fallen_font = pygame.font.Font('brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 45)
                 score = player.coins_collected * 10
                 time = (int)(time / 1000) # transform to seconds
                 minutes = (int)(time / 60)
                 seconds = (int)(time % 60)
 
+                bg_surf = pygame.image.load('backgrounds/fallen_menu.jpg')
+                bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
                 fallen_surf = fallen_font.render(f'You have fallen!', True, (64, 64, 64))
-                fallen_rect = fallen_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60)) # determined by successive tries
-
+                fallen_rect = fallen_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
                 score_surf = fallen_font.render(f'Score: {score}', True, (64, 64, 64))
                 score_rect = score_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
@@ -90,26 +85,43 @@ class Level():
                         time_surf = fallen_font.render(f'Time: 0{minutes}:{seconds}', True, (64, 64, 64))
                 time_rect = time_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60))
 
-                #restart_button = Button(400, 400, "Try Again")
-                #restart_button.get_img("button_images_01", 5, "png") 
-
-                screen.blit(fallen_surf, fallen_rect)
-                screen.blit(score_surf, score_rect)
-                screen.blit(time_surf, time_rect)
-
-                pygame.display.update()
-
-                # stop background music
+                self.display_update()
                 mixer.music.stop()
-
-                # play loss music
                 loss_sound.play()
 
-                # delayed exit
-                pygame.time.delay(LOSS_SCREEN_DURATION)
+                restart_button = Button(400, 600, "Retry")
+                restart_button.get_img(1, "button_images_01", 5, "png")
 
-                # quit to the main menu
-                self.running = False
+                main_menu_button = Button(600, 600, "Quit")
+                main_menu_button.get_img(1, "button_images_01", 5, "png")
+                
+                while self.displaying_fallen == True:
+                        # allow mouse clicks to be identified and also allow rage quitting :))
+                        for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                        self.running = False
+                                        self.displaying_fallen = False
+                        
+                        # redraw the menu every frame
+                        screen.blit(bg_surf, (0, 0))
+                        screen.blit(fallen_surf, fallen_rect)
+                        screen.blit(score_surf, score_rect)
+                        screen.blit(time_surf, time_rect)
+
+                        # update buttons, FPS and the whole display
+                        restart_button.update()
+                        main_menu_button.update()
+                        self.display_update()
+                        self.clock.tick(FPS)
+
+                        if restart_button.was_pressed >= 1:
+                                self.displaying_fallen = False
+                                self.reset()
+                                self.run_level()
+                        
+                        elif main_menu_button.was_pressed >= 1:
+                                self.displaying_fallen = False
+                                self.running = False
         
         def display_death(self):
                 player.death_img_index += 0.1
