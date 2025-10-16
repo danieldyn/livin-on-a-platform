@@ -169,10 +169,18 @@ class Player():
                                         obj_mask = img[2]
                                         # print((self.player_rect.x, self.player_rect.y))
                                         if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - self.player_rect.y)):
-                                                if obj.object_shown == True:
-                                                        coin_sound.play()
-                                                        self.coins_collected += 1 # avoid point farming after collecting the coin
-                                                obj.object_shown = False # remove the object from screen
+                                                if obj.object_can_be_collected == True:
+                                                        if obj.object_shown == True:
+                                                                coin_sound.play()
+                                                                self.coins_collected += 1 # avoid point farming after collecting the coin
+                                                        obj.object_shown = False # remove the object from screen
+                                                elif obj.can_interact_with_player == True: # if object cannot be collected and it can interact with player
+                                                        # interaction will happen when ENTER is pressed
+                                                        if keys[pygame.K_RETURN] == True:
+                                                                obj.player_is_interacting_with_object = True
+
+                                                
+                                                        
                                                 
 
                         screen.blit(img_frame, self.player_rect)

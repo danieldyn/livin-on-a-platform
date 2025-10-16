@@ -17,7 +17,7 @@ class World():
         def get_world_data(self, file_path):
                 with open(file_path) as file:
                         for line in file:
-                                self.world_data.append([int(c) for c in line.strip()])
+                                self.world_data.append([c for c in line.strip()])
 
         def get_block_list(self, grid):
                 grass_img = pygame.image.load('ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable1.png')
@@ -29,7 +29,12 @@ class World():
                 for row in grid:
                         col_count = 0
                         for block in row:
-                                if block == 1:
+                                if block == '-':
+                                        # ignore block
+                                        # some objects are inserted into the text file as 1 block, but they occupy more space
+                                        # adding an ignore block lets us signal that some adjacent blocks are occupied
+                                        pass
+                                if block == '1':
                                         # dirt block
                                         image = pygame.transform.scale(dirt_img, (BLOCK_SIZE, BLOCK_SIZE))
                                         dirt_rect = image.get_rect()
@@ -38,7 +43,7 @@ class World():
                                         block_mask = pygame.mask.from_surface(image)
                                         block_var = (image, dirt_rect, block_mask)
                                         self.block_list.append(block_var)
-                                if block == 2:
+                                if block == '2':
                                         # grass block
                                         image = pygame.transform.scale(grass_img, (BLOCK_SIZE, BLOCK_SIZE))
                                         grass_rect = image.get_rect()
@@ -47,7 +52,7 @@ class World():
                                         block_mask = pygame.mask.from_surface(image)
                                         block_var = (image, grass_rect, block_mask)
                                         self.block_list.append(block_var)
-                                if block == 3:
+                                if block == '3':
                                         # water block
                                         image = pygame.transform.scale(water_img, (BLOCK_SIZE, BLOCK_SIZE))
                                         water_rect = image.get_rect()
@@ -56,14 +61,14 @@ class World():
                                         block_mask = pygame.mask.from_surface(image)
                                         block_var = (image, water_rect, block_mask)
                                         self.block_list.append(block_var)
-                                if block == 4:
+                                if block == '4':
                                         # coin block
                                         coin_x = BLOCK_SIZE * col_count
                                         coin_y = BLOCK_SIZE * row_count
                                         coin = objects.Object('brackeys_platformer_assets/sprites/coin.png', coin_x, coin_y)
-                                        coin.get_obj_img(16, 16, (0, 0, 0), 1, 12, coin.object_img_list)
+                                        coin.get_obj_img(16, 16, 1, (0, 0, 0), 1, 12, coin.object_img_list)
                                         self.obj_list.append(coin)
-                                if block == 5:
+                                if block == '5':
                                         # spike block
                                         image = pygame.transform.scale(spike_img, (BLOCK_SIZE, BLOCK_SIZE))
                                         spike_rect = image.get_rect()
@@ -72,6 +77,56 @@ class World():
                                         spike_mask = pygame.mask.from_surface(image)
                                         img = (image, spike_rect, spike_mask)
                                         self.dangerous_blocks_list.append(img)
+                                # chests will be increasingly nicer as the number is higer
+                                if block == '6':
+                                        # tier 1 chest (least nice)
+                                        chest_x = BLOCK_SIZE * col_count
+                                        chest_y = BLOCK_SIZE * row_count
+                                        chest_obj = objects.Object('brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                                        chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 1, 5, chest_obj.object_img_list)
+                                        chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 2, 5, chest_obj.object_img_list)
+                                        chest_obj.object_can_be_collected = False # a chest cannot be collected
+                                        chest_obj.can_interact_with_player = True
+                                        self.obj_list.append(chest_obj)
+                                if block == '7':
+                                        # tier 2 chest
+                                        chest_x = BLOCK_SIZE * col_count
+                                        chest_y = BLOCK_SIZE * row_count
+                                        chest_obj = objects.Object('brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                                        chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 3, 5, chest_obj.object_img_list)
+                                        chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 4, 5, chest_obj.object_img_list)
+                                        chest_obj.object_can_be_collected = False # a chest cannot be collected
+                                        chest_obj.can_interact_with_player = True
+                                        self.obj_list.append(chest_obj)
+                                if block == '8':
+                                        # tier 3 chest
+                                        chest_x = BLOCK_SIZE * col_count
+                                        chest_y = BLOCK_SIZE * row_count
+                                        chest_obj = objects.Object('brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                                        chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 5, 5, chest_obj.object_img_list)
+                                        chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 6, 5, chest_obj.object_img_list)
+                                        chest_obj.object_can_be_collected = False # a chest cannot be collected
+                                        chest_obj.can_interact_with_player = True
+                                        self.obj_list.append(chest_obj)
+                                if block == '9':
+                                        # tier 4 chest (nicest)
+                                        chest_x = BLOCK_SIZE * col_count
+                                        chest_y = BLOCK_SIZE * row_count
+                                        chest_obj = objects.Object('brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                                        chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 7, 5, chest_obj.object_img_list)
+                                        chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 8, 5, chest_obj.object_img_list)
+                                        chest_obj.object_can_be_collected = False # a chest cannot be collected
+                                        chest_obj.can_interact_with_player = True
+                                        self.obj_list.append(chest_obj)
+                                if block == 'a':
+                                        # tree
+                                        tree_x = BLOCK_SIZE * col_count
+                                        tree_y = BLOCK_SIZE * row_count
+                                        tree_obj = objects.Object('ClassicPlatformerAssets/Tree/tree.png', tree_x, tree_y)
+                                        tree_obj.get_obj_img(48, 80, 1.2, (0, 0, 0), 1, 1, tree_obj.object_img_list)
+                                        tree_obj.object_can_be_collected = False # a tree cannot be collected
+                                        self.obj_list.append(tree_obj)
+                                        
                                 col_count += 1
                         row_count += 1
 
