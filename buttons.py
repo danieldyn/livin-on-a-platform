@@ -29,6 +29,7 @@ class Button():
             img_rect = img_surf.get_rect()
 
             # add text to button 
+            pygame.font.init()
             text_font = pygame.font.Font('brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 25)
             text_surf = text_font.render(self.text_on_button, True, (20, 20, 20))
             text_rect = text_surf.get_rect(center=img_rect.center) # for positioning

@@ -140,11 +140,11 @@ class World():
 
 
 # Keep this commented unless you want to debug the screen layout
-        # def draw_grid():
-        #         for line in range(0, 73):
-        #                 pygame.draw.line(screen, (0, 0, 0), (0, line * block_size), (screen_width, line * block_size))
-        #                 pygame.draw.line(screen, (0, 0, 0), (line * block_size, 0), (line * block_size, screen_height))
-        #draw_grid()
+# def draw_grid():
+#         for line in range(0, 73):
+#                 pygame.draw.line(screen, (0, 0, 0), (0, line * block_size), (screen_width, line * block_size))
+#                 pygame.draw.line(screen, (0, 0, 0), (line * block_size, 0), (line * block_size, screen_height))
+#draw_grid()
 
 def create_world(path_to_world_data):
         world = World() # new world

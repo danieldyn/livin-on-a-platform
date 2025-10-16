@@ -10,6 +10,7 @@ ROLLING_IMAGE_INCREMENT = 0.15 # faster rolling animation
 IDLE_IMAGE_INCREMENT = 0.1
 OBJECT_IMAGE_INCREMENT = 0.1
 BUTTON_IMAGE_INCREMENT = 0.35
+COIN_MULTIPLIER = 10
 
 # screen setup
 from pygame import display
