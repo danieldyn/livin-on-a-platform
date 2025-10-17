@@ -2,7 +2,7 @@ import pygame
 from buttons import Button
 from levels import Level, main_menu
 from worlds import world_level_01
-
+from settings import menu_sound
 
 pygame.init()
 
@@ -13,6 +13,7 @@ pygame.init()
 #                self.gameover = False
 #                self.run()
 
+menu_sound.play()
 start_button = Button(400, 700, "Start") # test coordinates (will change for final main menu)
 start_button.get_img(1, "button_images_01", 5, "png")
 
@@ -35,6 +36,7 @@ while running:
                 start_button.update()
                 if start_button.was_pressed >= 1:
                         main_menu.running = False
+                        menu_sound.stop()
                         level1 = Level('backgrounds/sky.jpg', world_level_01)
                         level_list.append(level1)
                         current_level = 0

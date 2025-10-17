@@ -1,5 +1,6 @@
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER, screen, loss_sound, victory_sound, mixer
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
+from settings import screen, loss_sound, victory_sound, mixer
 from character import player
 from worlds import world_main_menu
 from buttons import Button

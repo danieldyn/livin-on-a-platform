@@ -2,7 +2,7 @@
 
 import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
-from settings import screen, coin_sound
+from settings import screen, coin_sound, hit_sound
 
 class Player():
         def __init__(self, x, y):
@@ -130,8 +130,8 @@ class Player():
 
                         # hitting the block
                         if img_mask.overlap(danger_block_mask, (danger_block_rect.x - self.player_rect.x, block_rect.y - (self.player_rect.y + dy))) or img_mask.overlap(danger_block_mask, (danger_block_rect.x - (self.player_rect.x + dx), danger_block_rect.y - self.player_rect.y)):
+                                hit_sound.play()
                                 self.player_is_alive = False
-                                # print("OH NO")
 
                 if self.player_is_alive == True:
 
@@ -183,10 +183,6 @@ class Player():
                                                                 obj.player_is_interacting_with_object = True
                                                                 if len(obj.object_img_list) == 1: # check if the object is the end level flag
                                                                         self.completed_current_level = True
-
-                                                
-                                                        
-                                                
 
                         screen.blit(img_frame, self.player_rect)
                 else:

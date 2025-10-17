@@ -1,9 +1,8 @@
 # General usage parameters and game settings
 
 BLOCK_SIZE = 16 # px
-SCREEN_WIDTH = 1152 # 16px * 72 blocks
-SCREEN_HEIGHT = 864 # 16px * 54 blocks
-LOSS_SCREEN_DURATION = 5000 # miliseconds
+SCREEN_WIDTH = 72 * BLOCK_SIZE
+SCREEN_HEIGHT = 54 * BLOCK_SIZE
 FPS = 60
 RUNNING_IMAGE_INCREMENT = 0.1
 ROLLING_IMAGE_INCREMENT = 0.15 # faster rolling animation
@@ -24,6 +23,10 @@ mixer.init()
 loss_sound = mixer.Sound('brackeys_platformer_assets/sounds/player_losing.wav')
 victory_sound = mixer.Sound('brackeys_platformer_assets/sounds/victory.wav')
 coin_sound = mixer.Sound('brackeys_platformer_assets/sounds/coin.wav') # two options here, also coin_collected.wav
+button_sound = mixer.Sound('brackeys_platformer_assets/sounds/button_sound.mp3')
+chest_sound = mixer.Sound('brackeys_platformer_assets/sounds/chest.wav')
+hit_sound = mixer.Sound('brackeys_platformer_assets/sounds/hit.mp3')
+menu_sound = mixer.Sound('brackeys_platformer_assets/sounds/background.mp3')
 
 # background music for levels
 mixer.music.load('brackeys_platformer_assets/music/game_level_music.wav')

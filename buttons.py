@@ -1,5 +1,5 @@
 import pygame
-from settings import screen
+from settings import screen, button_sound
 from settings import BUTTON_IMAGE_INCREMENT
 
 class Button():
@@ -12,6 +12,7 @@ class Button():
         self.button_image_index = 0
         self.was_pressed = 0
         self.text_on_button = text_on_button
+        self.sound = button_sound
 
     def reset(self):
         self.was_pressed = 0
@@ -46,6 +47,7 @@ class Button():
 
         if self.button_rect.collidepoint(mouse_coordinates) and first_button_img.get_at((mouse_x - self.button_rect.x, mouse_y - self.button_rect.y)) == 1: # collision
                 if pygame.mouse.get_pressed()[0] == True: # left click
+                     self.sound.play()
                      self.can_press_button = False # can't press twice (before the animation cycle is complete)
 
         if self.can_press_button == False: # it is currently being pressed
