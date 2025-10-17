@@ -24,6 +24,7 @@ class World():
                 dirt_img = pygame.image.load('ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable4.png')
                 water_img = pygame.image.load('ClassicPlatformerAssets/Water/water.png')
                 spike_img = pygame.image.load('ClassicPlatformerAssets/Props/spikes.png')
+                flag_img = pygame.image.load('ClassicPlatformerAssets/Checkpoint/checkpoint.png')
 
                 row_count = 0
                 for row in grid:
@@ -126,6 +127,15 @@ class World():
                                         tree_obj.get_obj_img(48, 80, 1.2, (0, 0, 0), 1, 1, tree_obj.object_img_list)
                                         tree_obj.object_can_be_collected = False # a tree cannot be collected
                                         self.obj_list.append(tree_obj)
+                                if block == 'b':
+                                        # end of level flag
+                                        flag_x = BLOCK_SIZE * col_count
+                                        flag_y = BLOCK_SIZE * row_count
+                                        flag_obj = objects.Object('ClassicPlatformerAssets/Checkpoint/checkpoint.png', flag_x, flag_y)
+                                        flag_obj.get_obj_img(48, 32, 1, (0, 0, 0), 1, 1, flag_obj.object_img_list)
+                                        flag_obj.object_can_be_collected = False # the end of level flag cannot be collected
+                                        flag_obj.can_interact_with_player = True
+                                        self.obj_list.append(flag_obj)
                                         
                                 col_count += 1
                         row_count += 1

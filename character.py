@@ -6,6 +6,7 @@ from settings import screen, coin_sound
 
 class Player():
         def __init__(self, x, y):
+                # basic parameters
                 self.starting_x = x
                 self.starting_y = y
                 self.player_gravity = -15
@@ -21,7 +22,7 @@ class Player():
                 self.rolling_img_list = []
                 self.idle_image_list = []
                 self.death_img_list = []
-
+                # relevant in-game aspects
                 self.img = pygame.image.load('brackeys_platformer_assets/sprites/knight.png').convert_alpha()
                 self.player_rect = pygame.rect.Rect(self.starting_x, self.starting_y, self.player_width, self.player_height)
                 self.can_jump = True
@@ -29,10 +30,12 @@ class Player():
                 self.coins_collected = 0
                 self.jump_sound = pygame.mixer.Sound('brackeys_platformer_assets/sounds/jump.wav')
                 self.player_is_alive = True
+                self.completed_current_level = False
 
         def reset(self):
                 self.player_rect.topleft = (self.starting_x, self.starting_y)
                 self.coins_collected = 0
+                self.completed_current_level = False
                 
         def get_img(self, sheet, width, height, color, row_number, number_of_images, list_of_images):
                 # row_number starting from 1
@@ -178,6 +181,8 @@ class Player():
                                                         # interaction will happen when ENTER is pressed
                                                         if keys[pygame.K_RETURN] == True:
                                                                 obj.player_is_interacting_with_object = True
+                                                                if len(obj.object_img_list) == 1: # check if the object is the end level flag
+                                                                        self.completed_current_level = True
 
                                                 
                                                         

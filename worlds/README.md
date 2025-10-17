@@ -9,3 +9,4 @@
 - `5` <=> spike block
 - `6-9` <=> chest tier 1-4 (value increasing)
 - `a` <=> tree
+- 'b' <=> end of level flag

@@ -22,6 +22,7 @@ mixer.init()
 
 # initialise sound effects
 loss_sound = mixer.Sound('brackeys_platformer_assets/sounds/player_losing.wav')
+victory_sound = mixer.Sound('brackeys_platformer_assets/sounds/victory.wav')
 coin_sound = mixer.Sound('brackeys_platformer_assets/sounds/coin.wav') # two options here, also coin_collected.wav
 
 # background music for levels

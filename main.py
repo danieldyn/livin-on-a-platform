@@ -16,8 +16,11 @@ pygame.init()
 start_button = Button(400, 700, "Start") # test coordinates (will change for final main menu)
 start_button.get_img(1, "button_images_01", 5, "png")
 
+# initialise before the main loop
 running = True
-level1 = None # initialise before loop
+level_list = []
+current_level = None
+level1 = None
 
 while running:
         for event in pygame.event.get():
@@ -33,16 +36,18 @@ while running:
                 if start_button.was_pressed >= 1:
                         main_menu.running = False
                         level1 = Level('backgrounds/sky.jpg', world_level_01)
+                        level_list.append(level1)
+                        current_level = 0
                         level1.reset()
                 main_menu.display_update()
 
-        elif level1 and level1.running == True:
-                level1.run_level()
+        elif level_list[current_level] and level_list[current_level].running == True:
+                level_list[current_level].run_level()
 
         else:
                 # return to main menu and reset the level attempt
                 main_menu.running = True
                 start_button.reset()
-                level1 = None
+                level_list = []
 
 pygame.quit()

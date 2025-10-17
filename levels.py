@@ -1,5 +1,5 @@
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER, screen, loss_sound, mixer
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER, screen, loss_sound, victory_sound, mixer
 from character import player
 from worlds import world_main_menu
 from buttons import Button
@@ -19,7 +19,7 @@ class Level():
                 self.clock = pygame.time.Clock()
                 self.start_time = pygame.time.get_ticks()
                 self.state = "playing"
-                self.fallen_time = 0
+                self.ending_time = 0
                 self.fallen_buttons = False
                 self.main_menu_button = None
                 self.restart_button = None
@@ -46,6 +46,9 @@ class Level():
         def display_objects(self):
                 for obj in self.world.obj_list:
                         obj.obj_animation()
+        
+        def display_update(self):
+                pygame.display.update()
 
         def display_score(self):
                 score_font = pygame.font.Font('brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 25)
@@ -61,37 +64,34 @@ class Level():
                 minutes = (int)(time / 60)
                 seconds = (int)(time % 60)
 
-                if minutes < 10:
-                        if seconds < 10:
-                                time_surf = time_font.render(f'Time: 0{minutes}:0{seconds}', True, (64, 64, 64))
-                        elif seconds < 60:
-                                time_surf = time_font.render(f'Time: 0{minutes}:{seconds}', True, (64, 64, 64))
-                else:
-                        if seconds < 10:
-                                time_surf = time_font.render(f'Time: {minutes}:0{seconds}', True, (64, 64, 64))
-                        elif seconds < 60:
-                                time_surf = time_font.render(f'Time: {minutes}:{seconds}', True, (64, 64, 64))
+                time_surf = time_font.render(f'Time: {minutes:02}:{seconds:02}', True, (64, 64, 64))
                 time_rect = time_surf.get_rect(center = (SCREEN_WIDTH - 150, 100))
                 screen.blit(time_surf, time_rect)
 
-        def display_fallen(self):
-                fallen_font = pygame.font.Font('brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 45)
+        def display_ending(self):
+                ending_font = pygame.font.Font('brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 45)
                 score = player.coins_collected * COIN_MULTIPLIER
-                time = (int)(self.fallen_time / 1000) # transform to seconds
+                time = (int)(self.ending_time / 1000) # transform to seconds
                 minutes = time // 60
                 seconds = time % 60
 
                 bg_surf = pygame.image.load('backgrounds/fallen_menu.jpg')
                 bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
-                fallen_surf = fallen_font.render(f'You have fallen!', True, (64, 64, 64))
-                fallen_rect = fallen_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
-                score_surf = fallen_font.render(f'Score: {score}', True, (64, 64, 64))
+                
+                if self.state == "fallen":
+                        ending_surf = ending_font.render(f'You have lost!', True, (64, 64, 64))
+                elif self.state == "completed":
+                        ending_surf = ending_font.render(f'You have won!', True, (64, 64, 64))
+                fallen_rect = ending_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
+                
+                score_surf = ending_font.render(f'Score: {score}', True, (64, 64, 64))
                 score_rect = score_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-                time_surf = fallen_font.render(f'Time: {minutes:02}:{seconds:02}', True, (64, 64, 64))
+                
+                time_surf = ending_font.render(f'Time: {minutes:02}:{seconds:02}', True, (64, 64, 64))
                 time_rect = time_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60))
 
                 screen.blit(bg_surf, (0, 0))
-                screen.blit(fallen_surf, fallen_rect)
+                screen.blit(ending_surf, fallen_rect)
                 screen.blit(score_surf, score_rect)
                 screen.blit(time_surf, time_rect)
 
@@ -111,8 +111,8 @@ class Level():
                 player.death_img_index += 0.1
                 if player.death_img_index >= len(player.death_img_list):
                         player.death_img_index = 0
-                        self.state = "fallen" # after ending the death amnimation, treat the rest as the fallen case
-                        self.fallen_time = pygame.time.get_ticks() - self.start_time
+                        self.state = "fallen" # after the death amnimation, treat the rest as the fallen case
+                        self.ending_time = pygame.time.get_ticks() - self.start_time
                         pygame.time.delay(200) # avoid making the transition very sudden  
                         mixer.music.stop()
                         loss_sound.play()
@@ -120,9 +120,12 @@ class Level():
                 
                 img_frame = player.death_img_list[int(player.death_img_index)][0] # the surface
                 screen.blit(img_frame, player.player_rect)
-
-        def display_update(self):
-                pygame.display.update()
+        
+        def display_victory(self):
+                self.ending_time = pygame.time.get_ticks() - self.start_time
+                pygame.time.delay(100) # avoid making the transition very sudden
+                mixer.music.stop()
+                victory_sound.play()
 
         def run_level(self):
                 self.clock.tick(FPS)
@@ -138,14 +141,19 @@ class Level():
                                 self.display_score() # layer 4
                                 self.display_time() # layer 5
 
-                elif self.state == "dead":
+                if player.completed_current_level == True and self.state != "completed":
+                        self.state = "completed"
+                        self.display_victory()
+
+                if self.state == "dead":
+                        # call all of these to have a fluid death animation
                         self.display_world()
                         self.display_objects()
-                        self.display_death() # will also display fallen screen
+                        self.display_death()
 
-                elif self.state == "fallen":
-                        self.display_fallen()
-                
+                if self.state == "completed" or self.state == "fallen":
+                        self.display_ending()
+                             
                 self.display_update() # go back to layer 1
 
 main_menu = Level('backgrounds/sky.jpg', world_main_menu)
