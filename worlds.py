@@ -167,3 +167,6 @@ world_main_menu = create_world("worlds/main_menu.txt")
 
 # level 01
 world_level_01 = create_world("worlds/world1.txt")
+
+# empty world (good for menus)
+empty_level = create_world("worlds/empty_world.txt")

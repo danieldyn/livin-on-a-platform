@@ -10,6 +10,7 @@ IDLE_IMAGE_INCREMENT = 0.1
 OBJECT_IMAGE_INCREMENT = 0.1
 BUTTON_IMAGE_INCREMENT = 0.35
 COIN_MULTIPLIER = 10
+WHITE = (255, 255, 255)
 
 # screen setup
 from pygame import display
@@ -32,3 +33,20 @@ menu_sound = mixer.Sound('brackeys_platformer_assets/sounds/background.mp3')
 mixer.music.load('brackeys_platformer_assets/music/game_level_music.wav')
 volume = mixer.music.get_volume()
 mixer.music.set_volume(volume - 0.5) # test option
+
+# menu texts
+instructions = [
+    "Game Instructions",
+    "Make your way through the worlds as quickly and",
+    "as efficiently as possible. Your performance will",
+    "be evaluated based on completion time and the",
+    "amount of coins collected on the way. Think your",
+    "approach carefully, as some treasures are guarded",
+    "by deadly traps and elusive enemies!",
+    "",
+    "Controls",
+    "Move the player using Right Arrow and Left Arrow.",
+    "Press Space to jump and Right Shift to roll.",
+    "Press Enter to collect Chests and touch the Flag.",
+    "Left click on buttons to interact with them."
+]

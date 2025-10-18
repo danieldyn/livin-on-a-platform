@@ -16,7 +16,7 @@ class Button():
 
     def reset(self):
         self.was_pressed = 0
-        self.can_press_button = 1
+        self.can_press_button = True
         self.button_image_index = 0
 
     def get_img(self, scale, directory, number_of_image_files, image_file_type):
