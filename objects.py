@@ -1,7 +1,7 @@
 # Everything about the objects (an object is anything that can be "collected" or interacted with)
 
 import pygame
-from settings import screen, chest_sound, OBJECT_IMAGE_INCREMENT
+from settings import screen, OBJECT_IMAGE_INCREMENT
 
 class Object():
     def __init__(self, path_to_sheet, x, y): # x, y -> placement
@@ -43,7 +43,6 @@ class Object():
                 self.object_img_index += OBJECT_IMAGE_INCREMENT
                 if self.object_img_index >= len(self.object_img_list):
                     self.object_img_index = 0
-                    chest_sound.play() # still problematic, it plays when reloading the world and it shouldn't
                     self.player_is_interacting_with_object = False
                 obj_surface = self.object_img_list[int(self.object_img_index)][0]
                 screen.blit(obj_surface, self.obj_rect)

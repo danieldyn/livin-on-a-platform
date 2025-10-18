@@ -44,6 +44,10 @@ class Level():
         def display_player(self):
                 player.update(self.world)
         
+        def display_enemies(self):
+                for enemy in self.world.enemy_list:
+                        enemy.enemy_animation() 
+        
         def display_objects(self):
                 for obj in self.world.obj_list:
                         obj.obj_animation()
@@ -135,12 +139,13 @@ class Level():
                         self.display_world() # layer 1
                         self.display_objects() # layer 2
                         self.display_player() # layer 3
+                        self.display_enemies() # layer 4
 
                         if player.player_is_alive == False:
                                 self.state = "dead"
                         else:
-                                self.display_score() # layer 4
-                                self.display_time() # layer 5
+                                self.display_score() # layer 5
+                                self.display_time() # layer 6
 
                 if player.completed_current_level == True and self.state != "completed":
                         self.state = "completed"

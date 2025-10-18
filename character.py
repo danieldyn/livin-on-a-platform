@@ -2,7 +2,7 @@
 
 import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
-from settings import screen, coin_sound, hit_sound
+from settings import screen, coin_sound, hit_sound, chest_sound
 
 class Player():
         def __init__(self, x, y):
@@ -180,6 +180,7 @@ class Player():
                                                 elif obj.can_interact_with_player == True: # if object cannot be collected and it can interact with player
                                                         # interaction will happen when ENTER is pressed
                                                         if keys[pygame.K_RETURN] == True:
+                                                                chest_sound.play()
                                                                 obj.player_is_interacting_with_object = True
                                                                 if len(obj.object_img_list) == 1: # check if the object is the end level flag
                                                                         self.completed_current_level = True

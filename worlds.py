@@ -3,6 +3,7 @@
 import pygame
 from settings import BLOCK_SIZE, screen
 import objects
+import enemies
 
 class World():
         def __init__(self):
@@ -12,6 +13,9 @@ class World():
                 self.world_data = []
                 # dangerous blocks will harm you (you will lose a heart)
                 self.dangerous_blocks_list = []
+                # enemies
+                self.enemy_list = []
+                
                 
 
         def get_world_data(self, file_path):
@@ -136,7 +140,13 @@ class World():
                                         flag_obj.object_can_be_collected = False # the end of level flag cannot be collected
                                         flag_obj.can_interact_with_player = True
                                         self.obj_list.append(flag_obj)
-                                        
+                                if block == 'c':
+                                        # enemy (slime)
+                                        enemy_x = BLOCK_SIZE * col_count
+                                        enemy_y = BLOCK_SIZE * row_count
+                                        enemy = enemies.Enemy('brackeys_platformer_assets/sprites/slime_purple.png', enemy_x, enemy_y, 20) # 20 is a test value (hardcoded for now - will change later)
+                                        enemy.get_image(24, 24, 1.35, (0, 0, 0), 2, 4, enemy.animation_img_list) # 1.35 hardcoded value (gives the impression that the slime is touching the ground)
+                                        self.enemy_list.append(enemy)
                                 col_count += 1
                         row_count += 1
 
