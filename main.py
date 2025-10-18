@@ -52,8 +52,6 @@ while running:
                         main_menu.running = False
                         story_mode = True
                 
-                ##
-                # Warning, this doesn't work, will search for a solution
                 if start_button.was_pressed >= 1:
                         main_menu.running = False
                         story_mode = False
@@ -62,12 +60,10 @@ while running:
                         level_list.append(level1)
                         current_level = 0
                         level1.reset()
-                # End of disfunctional part
-                ##
 
                 main_menu.display_update()
 
-        if story_mode == True:
+        elif story_mode == True:
                 screen.blit(story_bg, (0, 0))
                 # write the paragraphs of text
                 y = 140
@@ -91,9 +87,8 @@ while running:
 
                 pygame.display.update()
 
-        elif level_list and level_list[current_level] and level_list[current_level].running == True:
+        elif level_list and level_list[current_level].running == True:
                 level_list[current_level].run_level()
-
         else:
                 # return to main menu and reset the level attempt
                 main_menu.running = True
