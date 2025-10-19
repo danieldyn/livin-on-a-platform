@@ -133,6 +133,12 @@ class Player():
                                 hit_sound.play()
                                 self.player_is_alive = False
 
+                for enemy in level_world.enemy_list:
+                        for img in enemy.animation_img_list:
+                                enemy_mask = img[1]
+                                if img_mask.overlap(enemy_mask, (enemy.enemy_rect.x - self.player_rect.x, enemy.enemy_rect.y - self.player_rect.y)):
+                                        self.player_is_alive = False
+
                 if self.player_is_alive == True:
 
                         # checking if player is idle

@@ -155,6 +155,7 @@ class Level():
                         # call all of these to have a fluid death animation
                         self.display_world()
                         self.display_objects()
+                        self.display_enemies()
                         self.display_death()
 
                 if self.state == "completed" or self.state == "fallen":
