@@ -1,0 +1,37 @@
+[tool.pylint.main]
+# Minimum score that we consider a success
+fail-under = 9
+
+# Check all files instead of stopping at first error
+persistent = true
+
+# Set max line length to a reasonable value
+max-line-length = 120
+
+# Slightly relaxed limits for small projects
+max-args = 10
+max-locals = 40
+max-branches = 50
+
+# Disable irrelevant rules
+disable = [
+    "no-member",
+    "import-error",
+    "too-many-instance-attributes",
+    "c-extension-no-member",
+    "too-many-positional-arguments",
+    "too-many-nested-blocks",
+    "too-many-function-args"
+]
+
+# Enable good practice rules
+load-plugins = ["pylint.extensions.docparams"]
+enable = [
+    "missing-docstring",
+    "too-few-public-methods",
+    "consider-using-enumerate",
+    "duplicate-code"
+]
+
+# Ignore pycache files that can appear inside src/
+ignore = ["__pycache__"]
