@@ -14,6 +14,9 @@ restart_button.get_img("button_images_01", 5, "png")
 main_menu_button = Button(600, 600, "Quit")
 main_menu_button.get_img("button_images_01", 5, "png")
 
+next_button = Button(500, 700, "Next")
+next_button.get_img("button_images_01", 5, "png")
+
 class Level():
     """
     A class that implements a level.
@@ -37,6 +40,7 @@ class Level():
         """
         A method resets a level.
         This will usually be used when restarting a level.
+        Also, it is very useful when switching between levels.
         """
         self.start_time = pygame.time.get_ticks()
         self.state = "playing"
@@ -44,8 +48,9 @@ class Level():
         player.reset()
         mixer.music.rewind()
         mixer.music.play()
-        restart_button.was_pressed = 0
-        main_menu_button.was_pressed = 0
+        restart_button.reset()
+        main_menu_button.reset()
+        next_button.reset()
         for obj in self.world.obj_list:
             obj.object_shown = True
 
@@ -117,7 +122,7 @@ class Level():
         minutes = time // 60
         seconds = time % 60
 
-        bg_surf = pygame.image.load('../backgrounds/fallen_menu.jpg')
+        bg_surf = pygame.image.load('../backgrounds/ending.jpg')
         bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         if self.state == "fallen":
@@ -126,7 +131,7 @@ class Level():
         else:
             ending_surf = ending_font.render(f'You have won!', True, (64, 64, 64))
 
-        fallen_rect = ending_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
+        ending_rect = ending_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
 
         score_surf = ending_font.render(f'Score: {score}', True, (64, 64, 64))
         score_rect = score_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
@@ -135,16 +140,22 @@ class Level():
         time_rect = time_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60))
 
         screen.blit(bg_surf, (0, 0))
-        screen.blit(ending_surf, fallen_rect)
+        screen.blit(ending_surf, ending_rect)
         screen.blit(score_surf, score_rect)
         screen.blit(time_surf, time_rect)
 
         restart_button.update()
         main_menu_button.update()
+        if self.state == "completed":
+            next_button.update() # only show next button when the level was won
 
         if restart_button.was_pressed >= 1:
             self.reset()
             self.state = "playing"
+
+        if next_button.was_pressed >= 1:
+            self.state = "next"
+            self.running = False
 
         elif main_menu_button.was_pressed >= 1:
             self.running = False

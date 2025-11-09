@@ -17,6 +17,7 @@ OBJECT_IMAGE_INCREMENT = 0.1
 BUTTON_IMAGE_INCREMENT = 0.35
 COIN_MULTIPLIER = 10
 WHITE = (255, 255, 255)
+BLACK = (64, 64, 64)
 
 # screen setup
 screen = display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -52,5 +53,52 @@ instructions = [
     "Move the player using Right Arrow and Left Arrow.",
     "Press Space to jump and Right Shift to roll.",
     "Press Enter to collect Chests and touch the Flag.",
-    "Left click on buttons to interact with them."
+    "Left click on buttons to interact with them.",
+    "",
+    "Ready to play now? --------------->"
+]
+
+story = [
+    "Game Story",
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
+    "sed do eiusmod tempor incididunt ut labore et dolore magna",
+    "aliqua. Ut enim ad minim veniam, quis nostrud exercitation",
+    "ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "Duis aute irure dolor in reprehenderit in voluptate velit",
+    "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint",
+    "occaecat cupidatat non proident, sunt in culpa qui officia",
+    "deserunt mollit anim id est laborum."
+    "",
+    "Lorem",
+    "ipsum",
+    "dolor",
+    "sit",
+    "",
+    "Ready to play now? --------------->"
+]
+
+play_hint = [
+    "Press to begin!",
+    "          I",
+    "          I",
+    "          I",
+    "          I",
+    "          ------->",
+]
+
+help_hint = [
+    "Need any help?",
+    "          I",
+    "          I",
+    "          I",
+    "          V"
+]
+
+story_hint = [
+    "Check out the story!",
+    "              I",
+    "              I",
+    "              I",
+    "              I",
+    "<---------",
 ]

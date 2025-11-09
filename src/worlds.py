@@ -188,8 +188,9 @@ def create_world(path_to_world_data):
 # main menu
 world_main_menu = create_world("../worlds/main_menu.txt")
 
-# level 01
+# level worlds
 world_level_01 = create_world("../worlds/world1.txt")
+world_level_02 = create_world("../worlds/world2.txt")
 
 # empty world (good for menus)
 empty_level = create_world("../worlds/empty_world.txt")
