@@ -43,7 +43,15 @@ frequency of 60 FPS even on modest hardware. There will be a fixed game window s
 no option to rescale it in-game.
 
 ### System Overview
-prezentare generală a sistemului, a componentelor acestuia (e.g., client/server, frontend/backend, protocoale folosite de comunicație, structură bază de date…); tot aici, de menționat ce limbaje / biblioteci / framework-uri veți folosi pentru implementare, precum și design patterns / paradigme de coding (dacă e cazul, + argumentare) etc.
+The game is built as a **standalone application**, running entirely on a **local client**.
+
+- **Game Loop** – controls the main update and render cycle of the game.  
+- **Game Logic** – handles all gameplay mechanics such as pixel-perfect collision detection, score display, time tracking, and management of different game states.
+- **Graphics** – responsible for sprite loading, animations, masking, and rendering of collectible and interactable objects (including chests, coins, spikes, finish flag, ...).  
+- **User Input** – processes keyboard, mouse, and button interactions, which affect the player's movement and ability to interact with objects.
+- **Story Mode** – accessible from the main screen, to present the game’s narrative.
+- **Help Module** – accessible from the main screen, providing gameplay instructions and controls.  
+- **Audio** – manages all sound effects and music, including background sound, object interaction and collection cues, death sounds, and victory sounds.
 
 ### Detailed Component Design:
 câte un subcapitol pentru fiecare componentă majoră a sistemului, de descris funcționalitatea și modul de implementare (ce module / clase / funcții principale vor fi implementate, etc.), relațiile / modurile de interfațare / comunicare cu celelalte module interne sau externe ale aplicației (e.g., folosire HTTP între frontend și backend, biblioteca Y pentru baza de date externă / API / aplicație / dispozitiv extern etc…);
