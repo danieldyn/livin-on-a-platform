@@ -75,7 +75,7 @@ class World():
                     # coin block
                     coin_x = BLOCK_SIZE * col_count
                     coin_y = BLOCK_SIZE * row_count
-                    coin = objects.Object('../brackeys_platformer_assets/sprites/coin.png', coin_x, coin_y)
+                    coin = objects.Object('../brackeys_platformer_assets/sprites/coin.png', coin_x, coin_y, 1)
                     coin.get_obj_img(16, 16, 1, (0, 0, 0), 1, 12, coin.object_img_list)
                     self.obj_list.append(coin)
                 if block == '5':
@@ -92,7 +92,7 @@ class World():
                     # tier 1 chest (least nice)
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
-                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y, 2)
                     chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 1, 5, chest_obj.object_img_list)
                     chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 2, 5, chest_obj.object_img_list)
                     chest_obj.object_can_be_collected = False # a chest cannot be collected
@@ -102,7 +102,7 @@ class World():
                     # tier 2 chest
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
-                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y, 4)
                     chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 3, 5, chest_obj.object_img_list)
                     chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 4, 5, chest_obj.object_img_list)
                     chest_obj.object_can_be_collected = False # a chest cannot be collected
@@ -112,7 +112,7 @@ class World():
                     # tier 3 chest
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
-                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y, 6)
                     chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 5, 5, chest_obj.object_img_list)
                     chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 6, 5, chest_obj.object_img_list)
                     chest_obj.object_can_be_collected = False # a chest cannot be collected
@@ -122,7 +122,7 @@ class World():
                     # tier 4 chest (nicest)
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
-                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y)
+                    chest_obj = objects.Object('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y, 10)
                     chest_obj.get_obj_img(48, 32, 1,(0, 0, 0), 7, 5, chest_obj.object_img_list)
                     chest_obj.get_obj_img(48, 32, 1, (0, 0, 0), 8, 5, chest_obj.object_img_list)
                     chest_obj.object_can_be_collected = False # a chest cannot be collected
@@ -132,7 +132,7 @@ class World():
                     # tree
                     tree_x = BLOCK_SIZE * col_count
                     tree_y = BLOCK_SIZE * row_count
-                    tree_obj = objects.Object('../ClassicPlatformerAssets/Tree/tree.png', tree_x, tree_y)
+                    tree_obj = objects.Object('../ClassicPlatformerAssets/Tree/tree.png', tree_x, tree_y, 0)
                     tree_obj.get_obj_img(48, 80, 1.2, (0, 0, 0), 1, 1, tree_obj.object_img_list)
                     tree_obj.object_can_be_collected = False # a tree cannot be collected
                     self.obj_list.append(tree_obj)
@@ -140,7 +140,7 @@ class World():
                     # end of level flag
                     flag_x = BLOCK_SIZE * col_count
                     flag_y = BLOCK_SIZE * row_count
-                    flag_obj = objects.Object('../ClassicPlatformerAssets/Checkpoint/checkpoint.png', flag_x, flag_y)
+                    flag_obj = objects.Object('../ClassicPlatformerAssets/Checkpoint/checkpoint.png', flag_x, flag_y, 0)
                     flag_obj.get_obj_img(48, 32, 1, (0, 0, 0), 1, 1, flag_obj.object_img_list)
                     flag_obj.object_can_be_collected = False # the end of level flag cannot be collected
                     flag_obj.can_interact_with_player = True

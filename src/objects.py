@@ -8,13 +8,14 @@ class Object():
     """
     A class that implements an object.
     An object is anything that can be collected or interacted with.
-    Interactable ones have an animation only available when the player gives input
+    Interactable ones have an animation only available when the player gives input.
     """
-    def __init__(self, path_to_sheet, x, y): # x, y -> placement
+    def __init__(self, path_to_sheet, x, y, value): # x, y -> placement
         self.object_sheet = pygame.image.load(path_to_sheet)
         self.object_img_list = []
         self.object_shown = True
         self.object_can_be_collected = True
+        self.value = value
         self.can_interact_with_player = False
         self.player_is_interacting_with_object = False
         self.sound_was_played = False
@@ -44,12 +45,16 @@ class Object():
         Else, wait for player input.
         """
         if not self.can_interact_with_player:
-            if self.object_shown:
+            if self.sound_was_played: # for chests
+                last = len(self.object_img_list) - 1
+                screen.blit(self.object_img_list[last][0], self.obj_rect)
+            elif self.object_shown: # for coins
                 self.object_img_index += OBJECT_IMAGE_INCREMENT
                 if self.object_img_index >= len(self.object_img_list):
                     self.object_img_index = 0
                 obj_surface = self.object_img_list[int(self.object_img_index)][0]
                 screen.blit(obj_surface, self.obj_rect)
+            
         else:
             if not self.player_is_interacting_with_object:
                 screen.blit(self.object_img_list[0][0], self.obj_rect)

@@ -2,6 +2,7 @@
 A method that handles the game's levels.
 """
 import pygame
+import score
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
 from settings import screen, loss_sound, victory_sound, mixer
 from character import player
@@ -17,14 +18,17 @@ main_menu_button.get_img("button_images_01", 5, "png")
 next_button = Button(500, 700, "Next")
 next_button.get_img("button_images_01", 5, "png")
 
+highscores = score.load_highscores()
+
 class Level():
     """
     A class that implements a level.
     The level contains a world and the player.
     The level has its own clock and score, based on performance.
     """
-    def __init__(self, bg_img, world):
+    def __init__(self, bg_img, world, idx):
         self.running = True
+        self.idx = idx
         bg_surf = pygame.image.load(bg_img)
         self.bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.world = world
@@ -183,9 +187,11 @@ class Level():
     def display_victory(self):
         """
         A method that hands over the control to display_ending after playing a victory sound".
+        Also handles highscore updating.
         """
         self.ending_time = pygame.time.get_ticks() - self.start_time
-        #pygame.time.delay(100) # avoid making the transition very sudden
+        # update highscore if necessary
+        score.update_highscores(self.idx, player.coins_collected * COIN_MULTIPLIER, highscores)
         mixer.music.stop()
         victory_sound.play()
         self.state = "completed"
@@ -224,4 +230,4 @@ class Level():
 
         self.display_update() # go back to layer 1
 
-main_menu = Level('../backgrounds/sky.jpg', world_main_menu)
+main_menu = Level('../backgrounds/sky.jpg', world_main_menu, 0)

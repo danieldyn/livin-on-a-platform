@@ -206,10 +206,15 @@ class Player():
                         elif obj.can_interact_with_player:
                             # interaction will happen when ENTER is pressed
                             if keys[pygame.K_RETURN]:
-                                chest_sound.play()
+                                if not obj.sound_was_played:
+                                    chest_sound.play()
+                                    obj.sound_was_played = True
                                 obj.player_is_interacting_with_object = True
                                 if len(obj.object_img_list) == 1: # check if the object is the end level flag
                                     self.completed_current_level = True
+                                else: # it is a chest containing a fixed amount of coins
+                                    self.coins_collected += obj.value
+                                    obj.can_interact_with_player = False # prevent point farming
 
             screen.blit(img_frame, self.player_rect)
         else:

@@ -37,8 +37,8 @@ level1 = None
 story_mode = False
 help_mode = False
 world_sequence = [
-    ("../backgrounds/sky.jpg", world_level_01),
-    ("../backgrounds/sky.jpg", world_level_02)
+    ("../backgrounds/sky.jpg", world_level_01, 1),
+    ("../backgrounds/sky.jpg", world_level_02, 2)
 ]
 
 while running:
@@ -76,7 +76,7 @@ while running:
         if help_button.was_pressed >= 1:
             main_menu.running = False
             help_mode = True
-        
+
         if story_button.was_pressed >= 1:
             main_menu.running = False
             story_mode = True
@@ -86,7 +86,7 @@ while running:
             story_mode = False
             menu_sound.stop()
             # initialise all levels in advance
-            level_list = [Level(bg, world) for bg, world in world_sequence]
+            level_list = [Level(bg, world, idx) for bg, world, idx in world_sequence]
             level_idx = 0
             level_list[level_idx].reset()
 
@@ -115,7 +115,7 @@ while running:
             level_list = []
 
         pygame.display.update()
-    
+
     elif story_mode:
         screen.blit(alt_bg, (0, 0))
         # write the paragraphs of text
