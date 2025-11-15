@@ -74,13 +74,6 @@ class Level(SoundAssets):
         """
         player.update(self.world)
 
-    def display_enemies(self):
-        """
-        A method that draws the level's enemies.
-        """
-        for enemy in self.world.enemy_list:
-            enemy.enemy_animation()
-
     def display_objects(self):
         """
         A method that draws the level's objects.
@@ -210,7 +203,6 @@ class Level(SoundAssets):
             self.display_world() # layer 1
             self.display_objects() # layer 2
             self.display_player() # layer 3
-            self.display_enemies() # layer 4
 
             if not player.player_is_alive:
                 self.state = "dead"
@@ -226,7 +218,6 @@ class Level(SoundAssets):
             # call all of these to have a fluid death animation
             self.display_world()
             self.display_objects()
-            self.display_enemies()
             self.display_death()
 
         if self.state in ("completed", "fallen"):

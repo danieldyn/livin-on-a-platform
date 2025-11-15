@@ -5,7 +5,7 @@ A module that handles the game's character (player).
 import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
 from settings import screen
-from objects import Object, CollectableObject, InteractableObject, EndOfLevelObject
+from objects import Object, CollectableObject, InteractableObject, EndOfLevelObject, DangerousObject
 from sounds import SoundAssets
 
 class Player(SoundAssets):
@@ -113,7 +113,7 @@ class Player(SoundAssets):
         img_mask = self.running_img_list[int(self.running_img_index)][2] # the mask of the player
 
         # collision
-
+        
         for block in level_world.block_list:
             block_rect = block[1] # the rect of the block
             block_mask = block[2] # the mask of the block
@@ -140,25 +140,7 @@ class Player(SoundAssets):
                 elif self.player_gravity < 0: # hitting the ceiling
                     dy = 0
                     self.player_gravity = 0
-
-        # print(level_world.dangerous_blocks_list)
-
-        for danger_block in level_world.dangerous_blocks_list:
-            danger_block_rect = danger_block[1]
-            danger_block_mask : pygame.Mask = danger_block[2]
-
-            # hitting the block
-            if img_mask.overlap(danger_block_mask, (danger_block_rect.x - self.player_rect.x, block_rect.y - (self.player_rect.y + dy))) or img_mask.overlap(danger_block_mask, (danger_block_rect.x - (self.player_rect.x + dx), danger_block_rect.y - self.player_rect.y)):
-                SoundAssets.hit.play()
-                self.player_is_alive = False
-
-        # check enemy collision
-        for enemy in level_world.enemy_list:
-            for img in enemy.animation_img_list:
-                enemy_mask = img[1]
-                if img_mask.overlap(enemy_mask, (enemy.enemy_rect.x - self.player_rect.x, enemy.enemy_rect.y - self.player_rect.y)):
-                    self.player_is_alive = False
-
+                
         if self.player_is_alive:
             # checking if player is idle
             img_frame = pygame.surface.Surface((0, 0))
@@ -193,7 +175,7 @@ class Player(SoundAssets):
             # Keep this commented unless you want to debug the player's hitbox range
             #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
 
-            # check if the player "collected" an object
+            # check player interaction with objects
 
             for obj in level_world.obj_list:
                 obj : Object
@@ -216,6 +198,9 @@ class Player(SoundAssets):
                                         self.completed_current_level = True
                                     else: # it is a chest containing a fixed amount of coins
                                         self.coins_collected += obj.value
+                        elif isinstance(obj, DangerousObject):
+                            if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x - dx, obj.obj_rect.y - self.player_rect.y - dy)):
+                                self.player_is_alive = False
 
             screen.blit(img_frame, self.player_rect)
         else:

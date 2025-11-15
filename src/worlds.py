@@ -3,9 +3,7 @@ A module that handles the worlds in the game.
 """
 import pygame
 from settings import BLOCK_SIZE, screen
-from objects import Coin, Chest, Tree, EndOfLevelObject
-# import only the 'sub'classes and sound 
-import enemies
+from objects import Coin, Chest, Tree, EndOfLevelObject, Slime, Spike
 
 class World():
     """
@@ -16,8 +14,6 @@ class World():
         self.block_list = []
         self.obj_list = []
         self.world_data = []
-        self.dangerous_blocks_list = []
-        self.enemy_list = []
         self.file_path = file_path
 
     def get_world_data(self):
@@ -35,7 +31,6 @@ class World():
         grass_img = pygame.image.load('../ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable1.png')
         dirt_img = pygame.image.load('../ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable4.png')
         water_img = pygame.image.load('../ClassicPlatformerAssets/Water/water.png')
-        spike_img = pygame.image.load('../ClassicPlatformerAssets/Props/spikes.png')
 
         row_count = 0
         for row in grid:
@@ -83,20 +78,18 @@ class World():
                     self.obj_list.append(coin)
                 if block == '5':
                     # spike block
-                    image = pygame.transform.scale(spike_img, (BLOCK_SIZE, BLOCK_SIZE))
-                    spike_rect = image.get_rect()
-                    spike_rect.x = BLOCK_SIZE * col_count
-                    spike_rect.y = BLOCK_SIZE * row_count
-                    spike_mask = pygame.mask.from_surface(image)
-                    img = (image, spike_rect, spike_mask)
-                    self.dangerous_blocks_list.append(img)
+                    spike_x = BLOCK_SIZE * col_count
+                    skipe_y = BLOCK_SIZE * row_count
+                    spike = Spike('../ClassicPlatformerAssets/Props/spikes.png', spike_x, skipe_y)
+                    spike.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, spike.object_img_list)
+                    self.obj_list.append(spike)
                 # chests will be increasingly more valuable as the number is higer
                 if block == '6':
                     # tier 1 chest (least nice)
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
                     chest = Chest('../brackeys_platformer_assets/sprites/chests.png', chest_x, chest_y, 2, 2)
-                    chest.get_object_image(48, 32, 1,(0, 0, 0), 1, 5, chest.object_img_list)
+                    chest.get_object_image(48, 32, 1, (0, 0, 0), 1, 5, chest.object_img_list)
                     chest.get_object_image(48, 32, 1, (0, 0, 0), 2, 5, chest.object_img_list)
                     self.obj_list.append(chest)
                 if block == '7':
@@ -139,13 +132,13 @@ class World():
                     self.obj_list.append(flag)
                 if block == 'c':
                     # enemy (slime)
-                    enemy_x = BLOCK_SIZE * col_count
-                    enemy_y = BLOCK_SIZE * row_count
-                    enemy = enemies.Enemy('../brackeys_platformer_assets/sprites/slime_purple.png', enemy_x, enemy_y, 20)
+                    slime_x = BLOCK_SIZE * col_count
+                    slime_y = BLOCK_SIZE * row_count
+                    slime = Slime('../brackeys_platformer_assets/sprites/slime_purple.png', slime_x, slime_y, 20)
                     # 20 is a test value (hardcoded for now - will change later)
-                    enemy.get_image(24, 24, 1.35, (0, 0, 0), 2, 4, enemy.animation_img_list)
+                    slime.get_object_image(24, 24, 1.35, (0, 0, 0), 2, 4, slime.object_img_list)
                     # 1.35 hardcoded value (gives the impression that the slime is touching the ground)
-                    self.enemy_list.append(enemy)
+                    self.obj_list.append(slime)
                 col_count += 1
             row_count += 1
 
@@ -157,8 +150,6 @@ class World():
             screen.blit(block[0], block[1])
             # Keep this commented unless you want to debug the screen layout
             # pygame.draw.rect(screen, (255, 255, 255), block[1], 1)
-        for dangerous_blocks in self.dangerous_blocks_list:
-            screen.blit(dangerous_blocks[0], dangerous_blocks[1])
 
 
 # Keep this commented unless you want to debug the screen layout
