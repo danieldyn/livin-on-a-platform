@@ -6,12 +6,13 @@ import pygame
 from buttons import Button
 from levels import Level, main_menu
 from worlds import world_level_01, world_level_02
-from settings import menu_sound, screen, instructions, story, play_hint, story_hint, help_hint
+from settings import screen, instructions, story, play_hint, story_hint, help_hint
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK
+from sounds import SoundAssets
 
 pygame.init()
 
-menu_sound.play()
+SoundAssets.menu_music.play()
 
 start_button = Button(300, 600, "Start")
 start_button.get_img("button_images_01", 5, "png")
@@ -84,7 +85,7 @@ while running:
         if start_button.was_pressed >= 1:
             main_menu.running = False
             story_mode = False
-            menu_sound.stop()
+            SoundAssets.menu_music.stop()
             # initialise all levels in advance
             level_list = [Level(bg, world, idx) for bg, world, idx in world_sequence]
             level_idx = 0
@@ -163,7 +164,7 @@ while running:
                     pygame.time.delay(3000) # stay on the victory screen for 3 seconds
                 # return to main menu and reset the level list
                 main_menu.running = True
-                menu_sound.play()
+                SoundAssets.menu_music.play()
                 start_button.reset()
                 level_list = []
 

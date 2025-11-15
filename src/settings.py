@@ -4,6 +4,7 @@ This module is meant to be shared by others, avoiding cross-import errors.
 """
 from pygame import display
 from pygame import mixer
+# import 'sub'classes
 
 # constants
 BLOCK_SIZE = 16 # px
@@ -24,15 +25,6 @@ screen = display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # mixer setup
 mixer.init()
-
-# initialise sound effects
-loss_sound = mixer.Sound('../brackeys_platformer_assets/sounds/player_losing.wav')
-victory_sound = mixer.Sound('../brackeys_platformer_assets/sounds/victory.wav')
-coin_sound = mixer.Sound('../brackeys_platformer_assets/sounds/coin.wav')
-button_sound = mixer.Sound('../brackeys_platformer_assets/sounds/button_sound.mp3')
-chest_sound = mixer.Sound('../brackeys_platformer_assets/sounds/chest.wav')
-hit_sound = mixer.Sound('../brackeys_platformer_assets/sounds/hit.mp3')
-menu_sound = mixer.Sound('../brackeys_platformer_assets/sounds/background.mp3')
 
 # background music for levels
 mixer.music.load('../brackeys_platformer_assets/music/game_level_music.wav')

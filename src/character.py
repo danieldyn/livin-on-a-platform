@@ -4,9 +4,11 @@ A module that handles the game's character (player).
 
 import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
-from settings import screen, coin_sound, hit_sound, chest_sound
+from settings import screen
+from objects import Object, CollectableObject, InteractableObject, EndOfLevelObject
+from sounds import SoundAssets
 
-class Player():
+class Player(SoundAssets):
     """
     A class that implements the player.
     """
@@ -147,9 +149,10 @@ class Player():
 
             # hitting the block
             if img_mask.overlap(danger_block_mask, (danger_block_rect.x - self.player_rect.x, block_rect.y - (self.player_rect.y + dy))) or img_mask.overlap(danger_block_mask, (danger_block_rect.x - (self.player_rect.x + dx), danger_block_rect.y - self.player_rect.y)):
-                hit_sound.play()
+                SoundAssets.hit.play()
                 self.player_is_alive = False
 
+        # check enemy collision
         for enemy in level_world.enemy_list:
             for img in enemy.animation_img_list:
                 enemy_mask = img[1]
@@ -193,28 +196,26 @@ class Player():
             # check if the player "collected" an object
 
             for obj in level_world.obj_list:
+                obj : Object
                 for img in obj.object_img_list:
                     obj_mask = img[2]
                     # print((self.player_rect.x, self.player_rect.y))
                     if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - self.player_rect.y)):
-                        if obj.object_can_be_collected:
-                            if obj.object_shown:
-                                coin_sound.play()
+                        if isinstance(obj, CollectableObject):
+                            if obj.object_is_usable:
+                                obj.sound.play()
                                 self.coins_collected += 1 # avoid point farming after collecting the coin
-                            obj.object_shown = False # remove the object from screen
-
-                        elif obj.can_interact_with_player:
+                            obj.object_is_usable = False # remove the object from screen
+                        elif isinstance(obj, InteractableObject):
                             # interaction will happen when ENTER is pressed
                             if keys[pygame.K_RETURN]:
-                                if not obj.sound_was_played:
-                                    chest_sound.play()
-                                    obj.sound_was_played = True
-                                obj.player_is_interacting_with_object = True
-                                if len(obj.object_img_list) == 1: # check if the object is the end level flag
-                                    self.completed_current_level = True
-                                else: # it is a chest containing a fixed amount of coins
-                                    self.coins_collected += obj.value
-                                    obj.can_interact_with_player = False # prevent point farming
+                                if obj.object_is_usable and obj.number_of_interactions > 0: # if it's not being used, you can TRY to use it
+                                    obj.object_is_usable = False
+                                    obj.sound.play()
+                                    if isinstance(obj, EndOfLevelObject): # check if the object is the end level flag
+                                        self.completed_current_level = True
+                                    else: # it is a chest containing a fixed amount of coins
+                                        self.coins_collected += obj.value
 
             screen.blit(img_frame, self.player_rect)
         else:

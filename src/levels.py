@@ -4,10 +4,12 @@ A method that handles the game's levels.
 import pygame
 import score
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
-from settings import screen, loss_sound, victory_sound, mixer
+from settings import screen, mixer
 from character import player
 from worlds import world_main_menu
 from buttons import Button
+from objects import Object
+from sounds import SoundAssets
 
 restart_button = Button(400, 600, "Retry")
 restart_button.get_img("button_images_01", 5, "png")
@@ -20,7 +22,7 @@ next_button.get_img("button_images_01", 5, "png")
 
 highscores = score.load_highscores()
 
-class Level():
+class Level(SoundAssets):
     """
     A class that implements a level.
     The level contains a world and the player.
@@ -83,7 +85,8 @@ class Level():
         A method that draws the level's objects.
         """
         for obj in self.world.obj_list:
-            obj.obj_animation()
+            obj : Object
+            obj.object_animation()
 
     def display_update(self):
         """
@@ -178,7 +181,7 @@ class Level():
             self.ending_time = pygame.time.get_ticks() - self.start_time
             pygame.time.delay(200) # avoid making the transition very sudden
             mixer.music.stop()
-            loss_sound.play()
+            SoundAssets.loss.play()
             return
 
         img_frame = player.death_img_list[int(player.death_img_index)][0] # the surface
@@ -193,7 +196,7 @@ class Level():
         # update highscore if necessary
         score.update_highscores(self.idx, player.coins_collected * COIN_MULTIPLIER, highscores)
         mixer.music.stop()
-        victory_sound.play()
+        SoundAssets.victory.play()
         self.state = "completed"
 
     def run_level(self):

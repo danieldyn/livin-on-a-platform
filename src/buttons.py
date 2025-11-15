@@ -2,10 +2,11 @@
 A module that handles the buttons used in menus.
 """
 import pygame
-from settings import screen, button_sound
+from settings import screen
 from settings import BUTTON_IMAGE_INCREMENT
+from sounds import SoundAssets
 
-class Button():
+class Button(SoundAssets):
     """
     A class that implements a Button.
     For now, all buttons have the same animation and the dimensions of the unscaled picture.
@@ -19,7 +20,7 @@ class Button():
         self.button_image_index = 0
         self.was_pressed = 0
         self.text_on_button = text_on_button
-        self.sound = button_sound
+        self.sound = SoundAssets.button
 
     def reset(self):
         """
