@@ -6,7 +6,7 @@ import score
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
 from settings import screen, mixer
 from character import player
-from worlds import world_main_menu
+from worlds import world_main_menu, reset_world
 from buttons import Button
 from objects import Object
 from sounds import SoundAssets
@@ -56,6 +56,7 @@ class Level(SoundAssets):
         mixer.music.play()
         restart_button.reset()
         main_menu_button.reset()
+        self.world = reset_world(self.world.file_path)
         next_button.reset()
         for obj in self.world.obj_list:
             obj.object_shown = True

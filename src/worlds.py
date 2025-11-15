@@ -12,18 +12,19 @@ class World():
     A class that implements an in-game world.
     Every world has a grid of blocks, objects, obstacles (dangerous objects) and enemies.
     """
-    def __init__(self):
+    def __init__(self, file_path):
         self.block_list = []
         self.obj_list = []
         self.world_data = []
         self.dangerous_blocks_list = []
         self.enemy_list = []
+        self.file_path = file_path
 
-    def get_world_data(self, file_path):
+    def get_world_data(self):
         """
         A method that completes a world's codified block grid.
         """
-        with open(file_path, encoding='utf-8') as file:
+        with open(self.file_path, encoding='utf-8') as file:
             for line in file:
                 self.world_data.append([c for c in line.strip()])
 
@@ -171,8 +172,17 @@ def create_world(path_to_world_data):
     """
     A method that creates a world based on the Object's methods for the grid and the blocks.
     """
-    world = World() # new world
-    world.get_world_data(path_to_world_data) # get data
+    world = World(path_to_world_data) # new world
+    world.get_world_data() # get data
+    world.get_block_list(world.world_data) # get blocks (and objects)
+    return world
+
+def reset_world(path_to_world_data):
+    """
+    A method that creates a world based on the Object's methods for the grid and the blocks.
+    """
+    world = World(path_to_world_data) # new world
+    world.get_world_data() # get data
     world.get_block_list(world.world_data) # get blocks (and objects)
     return world
 
