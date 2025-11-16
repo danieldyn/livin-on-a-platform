@@ -3,7 +3,7 @@ A module that handles the worlds in the game.
 """
 import pygame
 from settings import BLOCK_SIZE, screen
-from objects import Coin, Chest, Tree, EndOfLevelObject, Slime, Spike
+from objects import Coin, Chest, DecorationObject, EndOfLevelObject, Slime, Spike, StaticObject
 
 class World():
     """
@@ -28,9 +28,6 @@ class World():
         """
         A method that populates a world's block list according to the grid.
         """
-        grass_img = pygame.image.load('../ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable1.png')
-        dirt_img = pygame.image.load('../ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable4.png')
-        water_img = pygame.image.load('../ClassicPlatformerAssets/Water/water.png')
 
         row_count = 0
         for row in grid:
@@ -43,31 +40,25 @@ class World():
                     pass
                 if block == '1':
                     # dirt block
-                    image = pygame.transform.scale(dirt_img, (BLOCK_SIZE, BLOCK_SIZE))
-                    dirt_rect = image.get_rect()
-                    dirt_rect.x = BLOCK_SIZE * col_count
-                    dirt_rect.y = BLOCK_SIZE * row_count
-                    block_mask = pygame.mask.from_surface(image)
-                    block_var = (image, dirt_rect, block_mask)
-                    self.block_list.append(block_var)
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable4.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
                 if block == '2':
                     # grass block
-                    image = pygame.transform.scale(grass_img, (BLOCK_SIZE, BLOCK_SIZE))
-                    grass_rect = image.get_rect()
-                    grass_rect.x = BLOCK_SIZE * col_count
-                    grass_rect.y = BLOCK_SIZE * row_count
-                    block_mask = pygame.mask.from_surface(image)
-                    block_var = (image, grass_rect, block_mask)
-                    self.block_list.append(block_var)
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../ClassicPlatformerAssets/GrassBlockBuildable/grassblocksetBuildable1.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
                 if block == '3':
                     # water block
-                    image = pygame.transform.scale(water_img, (BLOCK_SIZE, BLOCK_SIZE))
-                    water_rect = image.get_rect()
-                    water_rect.x = BLOCK_SIZE * col_count
-                    water_rect.y = BLOCK_SIZE * row_count
-                    block_mask = pygame.mask.from_surface(image)
-                    block_var = (image, water_rect, block_mask)
-                    self.block_list.append(block_var)
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../ClassicPlatformerAssets/Water/water.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
                 if block == '4':
                     # coin
                     coin_x = BLOCK_SIZE * col_count
@@ -120,7 +111,7 @@ class World():
                     # tree
                     tree_x = BLOCK_SIZE * col_count
                     tree_y = BLOCK_SIZE * row_count
-                    tree = Tree('../ClassicPlatformerAssets/Tree/tree.png', tree_x, tree_y)
+                    tree = DecorationObject('../ClassicPlatformerAssets/Tree/tree.png', tree_x, tree_y)
                     tree.get_object_image(48, 80, 1.2, (0, 0, 0), 1, 1, tree.object_img_list)
                     self.obj_list.append(tree)
                 if block == 'b':

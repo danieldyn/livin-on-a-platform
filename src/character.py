@@ -5,7 +5,7 @@ A module that handles the game's character (player).
 import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
 from settings import screen
-from objects import Object, CollectableObject, InteractableObject, EndOfLevelObject, DangerousObject
+from objects import Object, CollectableObject, InteractableObject, EndOfLevelObject, DangerousObject, StaticObject, DecorationObject
 from sounds import SoundAssets
 
 class Player(SoundAssets):
@@ -38,6 +38,8 @@ class Player(SoundAssets):
         self.jump_sound = pygame.mixer.Sound('../brackeys_platformer_assets/sounds/jump.wav')
         self.player_is_alive = True
         self.completed_current_level = False
+        self.dx = 0
+        self.dy = 0
 
     def reset(self):
         """
@@ -62,6 +64,7 @@ class Player(SoundAssets):
             img_rect = img.get_rect()
             image = (img, img_rect, player_mask)
             list_of_images.append(image)
+            
 
     def update(self, level_world):
         """
@@ -69,8 +72,8 @@ class Player(SoundAssets):
         Usually, this will be called while running a level.
         """
         # movement
-        dx = 0
-        dy = self.player_gravity
+        self.dx = 0
+        self.dy = self.player_gravity
 
         self.player_gravity += 1
         self.player_gravity = min(self.player_gravity, 10)
@@ -85,7 +88,7 @@ class Player(SoundAssets):
                 self.player_is_rolling = False
                 self.rolling_img_index = 0 # reset for next roll
                 self.running_img_index += RUNNING_IMAGE_INCREMENT
-            dx += 5
+            self.dx += 5
 
         if keys[pygame.K_LEFT]:
             if keys[pygame.K_DOWN]:
@@ -95,13 +98,13 @@ class Player(SoundAssets):
                 self.player_is_rolling = False
                 self.rolling_img_index = 0 # reset for next roll
                 self.running_img_index += RUNNING_IMAGE_INCREMENT
-            dx -= 5
+            self.dx -= 5
 
         if keys[pygame.K_SPACE]:
             if self.can_jump:
                 self.jump_sound.play()
                 self.player_gravity = -15
-                dy = self.player_gravity
+                self.dy = self.player_gravity
                 self.can_jump = False # prevent button mashing and multi jumps
 
         if int(self.running_img_index) >= len(self.running_img_list):
@@ -112,40 +115,76 @@ class Player(SoundAssets):
 
         img_mask = self.running_img_list[int(self.running_img_index)][2] # the mask of the player
 
-        # collision
-        
-        for block in level_world.block_list:
-            block_rect = block[1] # the rect of the block
-            block_mask = block[2] # the mask of the block
+        # Keep this commented unless you want to debug the player's hitbox range
+        #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
 
-            is_corner = False
+        # check player interaction with objects
 
-            # going horizontally
-            if img_mask.overlap(block_mask, (block_rect.x - (self.player_rect.x + dx), block_rect.y - self.player_rect.y)):
-                dx = 0
-                is_corner = True
-            # going vertically
-            if img_mask.overlap(block_mask, (block_rect.x - self.player_rect.x, block_rect.y - (self.player_rect.y + dy))):
-                if is_corner:
-                    if self.can_jump: # this fixes top corners
-                        self.player_rect.bottom = block_rect.top
-                    else: # this fixes bottom corners (still a bit glitchy, but it doesn't get stuck anymore)
-                        self.player_rect.top = block_rect.bottom
+        for obj in level_world.obj_list:
+            obj : Object
+            for img in obj.object_img_list:
+                obj_mask = img[2]
+                if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - self.player_rect.y)):
+                    # if i AM overlapping with an object
+                    if isinstance(obj, CollectableObject):
+                        if obj.object_is_usable:
+                            obj.sound.play()
+                            self.coins_collected += 1 # avoid point farming after collecting the coin
+                        obj.object_is_usable = False # remove the object from screen
+                    elif isinstance(obj, InteractableObject):
+                        # interaction will happen when ENTER is pressed
+                        if keys[pygame.K_RETURN]:
+                            if obj.object_is_usable and obj.number_of_interactions > 0: # if it's not being used, you can TRY to use it
+                                obj.object_is_usable = False
+                                obj.sound.play()
+                                if isinstance(obj, EndOfLevelObject): # check if the object is the end level flag
+                                    self.completed_current_level = True
+                                else: # it is a chest containing a fixed amount of coins
+                                    self.coins_collected += obj.value
+                    elif isinstance(obj, DangerousObject):
+                        if obj.sound != None:
+                            obj.sound.play()
+                        self.player_is_alive = False
+                    
+                    
+        for obj in level_world.obj_list:
+            obj : Object
 
-                if self.player_gravity > 0: # landing on the ground
-                    dy = 0
-                    self.player_gravity = 0
-                    self.can_jump = True # jumping should be allowed whilst on the ground
+            if not isinstance(obj, StaticObject) or isinstance(obj, DecorationObject):
+                continue
 
-                elif self.player_gravity < 0: # hitting the ceiling
-                    dy = 0
-                    self.player_gravity = 0
-                
+            obj_mask = img[2] # the mask of the block
+
+            if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x - self.dx, obj.obj_rect.y - self.player_rect.y - self.dy)):
+
+                is_corner = False
+
+                # going horizontally
+                if img_mask.overlap(obj_mask, (obj.obj_rect.x - (self.player_rect.x + self.dx), obj.obj_rect.y - self.player_rect.y)):
+                    self.dx = 0
+                    is_corner = True
+                # going vertically
+                if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - (self.player_rect.y + self.dy))):
+                    if is_corner:
+                        if self.can_jump: # this fixes top corners
+                            self.player_rect.bottom = obj.obj_rect.top
+                        else: # this fixes bottom corners (still a bit glitchy, but it doesn't get stuck anymore)
+                            self.player_rect.top = obj.obj_rect.bottom
+
+                    if self.player_gravity > 0: # landing on the ground
+                        self.dy = 0
+                        self.player_gravity = 0
+                        self.can_jump = True # jumping should be allowed whilst on the ground
+
+                    elif self.player_gravity < 0: # hitting the ceiling
+                        self.dy = 0
+                        self.player_gravity = 0
+
         if self.player_is_alive:
             # checking if player is idle
             img_frame = pygame.surface.Surface((0, 0))
 
-            if dx == 0 and dy == 0:
+            if self.dx == 0 and self.dy == 0:
                 self.running_img_index = 0 # start running animation from beginning after idle state
                 self.idle_img_index += IDLE_IMAGE_INCREMENT
 
@@ -160,51 +199,22 @@ class Player(SoundAssets):
                 else:
                     img_frame = self.running_img_list[int(self.running_img_index)][0] # the surface
 
-                if dx < 0: # moving left
+                if self.dx < 0: # moving left
                     img_frame = pygame.transform.flip(img_frame, True, False).convert_alpha()
 
-                self.player_rect.y += dy
-                self.player_rect.x += dx
+                self.player_rect.y += self.dy
+                self.player_rect.x += self.dx
+
+            screen.blit(img_frame, self.player_rect)
 
             # check if player is on screen (after possible movement)
             if player.player_rect.y >= SCREEN_HEIGHT:
                 player.player_is_alive = False
             else:
                 player.player_is_alive = True
-
-            # Keep this commented unless you want to debug the player's hitbox range
-            #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
-
-            # check player interaction with objects
-
-            for obj in level_world.obj_list:
-                obj : Object
-                for img in obj.object_img_list:
-                    obj_mask = img[2]
-                    # print((self.player_rect.x, self.player_rect.y))
-                    if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - self.player_rect.y)):
-                        if isinstance(obj, CollectableObject):
-                            if obj.object_is_usable:
-                                obj.sound.play()
-                                self.coins_collected += 1 # avoid point farming after collecting the coin
-                            obj.object_is_usable = False # remove the object from screen
-                        elif isinstance(obj, InteractableObject):
-                            # interaction will happen when ENTER is pressed
-                            if keys[pygame.K_RETURN]:
-                                if obj.object_is_usable and obj.number_of_interactions > 0: # if it's not being used, you can TRY to use it
-                                    obj.object_is_usable = False
-                                    obj.sound.play()
-                                    if isinstance(obj, EndOfLevelObject): # check if the object is the end level flag
-                                        self.completed_current_level = True
-                                    else: # it is a chest containing a fixed amount of coins
-                                        self.coins_collected += obj.value
-                        elif isinstance(obj, DangerousObject):
-                            if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x - dx, obj.obj_rect.y - self.player_rect.y - dy)):
-                                self.player_is_alive = False
-
-            screen.blit(img_frame, self.player_rect)
         else:
             pass
+            
 
 # player
 player = Player(7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)

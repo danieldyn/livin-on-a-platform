@@ -2,7 +2,7 @@ from pygame import mixer
 from abc import ABC
 
 # initialise sound effects
-class SoundAssets(ABC):
+class SoundAssets(ABC, mixer.Sound):
     loss = mixer.Sound('../brackeys_platformer_assets/sounds/player_losing.wav')
     victory = mixer.Sound('../brackeys_platformer_assets/sounds/victory.wav')
     coin = mixer.Sound('../brackeys_platformer_assets/sounds/coin.wav')

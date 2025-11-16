@@ -18,6 +18,7 @@ class Object(ABC):
         self.object_img_list = []
         self.object_img_index = 0 
         self.object_is_usable = True
+        self.sound : SoundAssets = None
         self.obj_width = 16 
         self.obj_height = 16 
         self.obj_rect = pygame.rect.Rect(x, y, self.obj_width, self.obj_height)
@@ -84,27 +85,52 @@ class CollectableObject(Object, SoundAssets):
         else:
             pass
 
-class DangerousObject(Object, SoundAssets): # could also split this in 2 (Movable vs Imovable)
-        def __init__(self, path_to_sheet, x, y):
+class DangerousObject(Object, SoundAssets): 
+        def __init__(self, path_to_sheet, x, y, dx=0): # by default it is imovable (dx=0)
             super().__init__(path_to_sheet, x, y)
+            self.object_movement_range = (x - dx, x + dx)
+            self.dx = dx
+            self.direction = 1
         def object_animation(self):
-            # by default a dangerous object imoveable
             self.object_img_index += OBJECT_IMAGE_INCREMENT
             if self.object_img_index >= len(self.object_img_list):
                 self.object_img_index = 0
+            
             obj_surface = self.object_img_list[int(self.object_img_index)][0]
-            screen.blit(obj_surface, self.obj_rect)    
 
-class DecorationObject(Object): 
+            if self.dx == 0:
+                # default mode -> imovable
+                screen.blit(obj_surface, self.obj_rect)
+            else:
+                # specific mode -> movable
+                self.obj_rect.x += 1 * self.direction
+                if self.obj_rect.x >= self.object_movement_range[1]:
+                    self.direction = -1
+                if self.obj_rect.x <= self.object_movement_range[0]:
+                    self.direction = 1
+                if self.direction == -1: # going left
+                    obj_surface = pygame.transform.flip(obj_surface, True, False).convert_alpha()
+                screen.blit(obj_surface, self.obj_rect)  
+
+class StaticObject(Object): # it cannot be moved or crossed (i.e. block)
     def __init__(self, path_to_sheet, x, y):
         super().__init__(path_to_sheet, x, y)
-    
+
     def object_animation(self):
         self.object_img_index += OBJECT_IMAGE_INCREMENT
         if self.object_img_index >= len(self.object_img_list):
             self.object_img_index = 0
         obj_surface = self.object_img_list[int(self.object_img_index)][0]
         screen.blit(obj_surface, self.obj_rect)
+
+class DecorationObject(StaticObject): # static object whose collision is not checked, thus it can be crossed, but not moved
+    def __init__(self, path_to_sheet, x, y): 
+        super().__init__(path_to_sheet, x, y)
+
+class EndOfLevelObject(InteractableObject):
+    def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
+        super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
+        self.sound = SoundAssets.victory
 
 class Coin(CollectableObject):
     def __init__(self, path_to_sheet, x, y, value):
@@ -115,50 +141,16 @@ class Chest(InteractableObject):
     def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
         super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
         self.sound = SoundAssets.chest
-    
-class EndOfLevelObject(InteractableObject):
-    def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
-        super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
-        self.sound = SoundAssets.victory
 
 class Slime(DangerousObject):  
-    def __init__(self, path_to_sheet, x, y, dx):
-        super().__init__(path_to_sheet, x, y)
+    def __init__(self, path_to_sheet, x, y, dx=5): # by default the slime moves
+        super().__init__(path_to_sheet, x, y, dx)
         self.slime_width = 64
         self.slime_height = 64
-        self.slime_movement_range = (x - dx, x + dx)
-        self.direction = 1
-    
-    @override
-    def object_animation(self):
-        """
-        A method that runs a slime's animation.
-        Slimes can move left and right on their designated platform.
-        """
-        self.object_img_index += 0.1
-        if self.object_img_index >= len(self.object_img_list):
-            self.object_img_index = 0
 
-        img_surface = self.object_img_list[int(self.object_img_index)][0]
-
-        self.obj_rect.x += 1 * self.direction
-
-        if self.obj_rect.x >= self.slime_movement_range[1]:
-            self.direction = -1
-        if self.obj_rect.x <= self.slime_movement_range[0]:
-            self.direction = 1
-
-        if self.direction == -1: # going left
-            img_surface = pygame.transform.flip(img_surface, True, False).convert_alpha()
-
-        screen.blit(img_surface, self.obj_rect)
-
-class Spike(DangerousObject):
-    def __init__(self, path_to_sheet, x, y):
-        super().__init__(path_to_sheet, x, y)
-
-class Tree(DecorationObject):
-    def __init__(self, path_to_sheet, x, y):
-        super().__init__(path_to_sheet, x, y)
+class Spike(DangerousObject, SoundAssets):
+    def __init__(self, path_to_sheet, x, y, dx=0): # by default the spike doesn't move
+        super().__init__(path_to_sheet, x, y, dx)
+        self.sound = SoundAssets.hit
 
 # class Heart(Object) -> similar to coin (value = 0 / will add health_value)

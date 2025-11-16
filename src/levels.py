@@ -66,7 +66,7 @@ class Level(SoundAssets):
         A method that draws the level's world.
         """
         screen.blit(self.bg_surf, (0, 0))
-        self.world.draw()
+        # self.world.draw()
 
     def display_player(self):
         """
