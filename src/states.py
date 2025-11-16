@@ -72,6 +72,7 @@ class MainMenu(State):
         Updates buttons, draws everything and checks for transition.
         """
         main_menu.display_world()
+        main_menu.display_objects()
 
         # Display hints using hardcoded values to fit well in the chosen background
         y = 500
