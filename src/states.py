@@ -3,11 +3,12 @@ A module that contains all states that the game can reach.
 These are meant to be used by main.py to control the flow of the game loop.
 """
 import pygame
+import storage
 from abc import ABC, abstractmethod
 from buttons import Button
 from levels import Level, main_menu
 from worlds import world_level_01, world_level_02
-from settings import screen, instructions, story, play_hint, story_hint, help_hint
+from settings import screen, instructions, story, play_hint, story_hint, help_hint, feats_hint
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK
 from sounds import SoundAssets
 
@@ -57,6 +58,9 @@ class MainMenu(State):
         self.help_button = Button(472, 600, "Help")
         self.help_button.get_img("button_images_01", 5, "png")
 
+        self.feats_button = Button(SCREEN_WIDTH - 150, 5, "Feats")
+        self.feats_button.get_img("button_images_01", 5, "png")
+
     def startup(self):
         """
         Entering the main menu.
@@ -65,6 +69,7 @@ class MainMenu(State):
         self.start_button.reset()
         self.story_button.reset()
         self.help_button.reset()
+        self.feats_button.reset()
         SoundAssets.menu_music.play()
 
     def update(self):
@@ -90,11 +95,17 @@ class MainMenu(State):
             text = self.game.text_font.render(line, True, BLACK)
             screen.blit(text, (800, y))
             y = y + 25
+        y = 90
+        for line in feats_hint:
+            text = self.game.text_font.render(line, True, BLACK)
+            screen.blit(text, (750, y))
+            y = y + 25
 
         # Update buttons and check for input
         self.start_button.update()
         self.help_button.update()
         self.story_button.update()
+        self.feats_button.update()
 
         if self.help_button.was_pressed >= 1:
             self.done = True
@@ -103,6 +114,10 @@ class MainMenu(State):
         if self.story_button.was_pressed >= 1:
             self.done = True
             self.next_state = "story"
+        
+        if self.feats_button.was_pressed >= 1:
+            self.done = True
+            self.next_state = "feats"
 
         if self.start_button.was_pressed >= 1:
             self.done = True
@@ -110,7 +125,6 @@ class MainMenu(State):
             SoundAssets.menu_music.stop() # levels have a different soundtrack
 
         main_menu.display_update()
-
 
 class HelpScreen(State):
     """
@@ -188,6 +202,63 @@ class StoryScreen(State):
 
         pygame.display.update()
 
+class FeatsScreen(State):
+    """
+    A class that implements the 'Feats' screen.
+    Features a Return button and information about the player's achievements.
+    """
+    def __init__(self, game):
+        super().__init__(game)
+
+    def startup(self):
+        """
+        Entering the feats menu.
+        """
+        # Reset the return button to receive input
+        self.game.return_button.reset()
+
+    def update(self):
+        """
+        Updates buttons, draws everything and checks for transition.
+        """
+        # Draw the paragraphs and the background
+        screen.blit(self.game.alt_bg, (0, 0))
+        y = 140
+        text = self.game.text_font.render("Level Highscores", True, WHITE)
+        text_surf = pygame.Surface((text.get_width(), text.get_height()), pygame.SRCALPHA)
+        text_surf.fill((0, 0, 0, 158)) # partially transparent background
+        screen.blit(text_surf, (200, y))
+        screen.blit(text, (200, y))
+        y = y + 80
+        
+        x = 200
+        highscores = storage.highscores_to_string()
+        for score in highscores:
+            text = self.game.text_font.render(score, True, WHITE)
+            text_surf = pygame.Surface((text.get_width(), text.get_height()), pygame.SRCALPHA)
+            text_surf.fill((0, 0, 0, 158)) # partially transparent background
+            screen.blit(text_surf, (x, y))
+            screen.blit(text, (x, y))
+            y = y + 40
+            if y == 620:
+                y = 220
+                x = 600
+
+        # Display final hint
+        text = self.game.text_font.render("Ready to play now? --------------->", True, WHITE)
+        text_surf = pygame.Surface((text.get_width(), text.get_height()), pygame.SRCALPHA)
+        text_surf.fill((0, 0, 0, 158)) # partially transparent background
+        screen.blit(text_surf, (200, 700))
+        screen.blit(text, (200, 700))
+
+        # Wait for the user to want to return to the main menu
+        self.game.return_button.update()
+        if self.game.return_button.was_pressed >= 1:
+            self.done = True
+            self.next_state = "main_menu"
+
+        pygame.display.update()
+
 class Gameplay(State):
     """
     A class that implements the main gameplay state, managing the sequence of levels.
@@ -210,7 +281,14 @@ class Gameplay(State):
         """
         # Initialise all levels in advance
         self.level_list = [Level(bg, world, idx) for bg, world, idx in self.world_sequence]
-        self.level_idx = 0
+        # Determine which level will be run
+        if self.game.last_played_level == len(self.level_list):
+            self.game.last_played_level = 1
+
+        self.level_idx = self.game.last_played_level - 1
+        if self.level_idx < 0:
+            self.level_idx = 0
+
         self.current_level = self.level_list[self.level_idx]
         self.current_level.reset()
 
@@ -249,7 +327,7 @@ class Gameplay(State):
     def cleanup(self):
         """
         Resets level list when leaving the gameplay state, allowing to restart fresh.
-        Overrides the inherited methof from State.
+        Overrides the inherited methods from State.
         """
         self.level_list = []
         self.level_idx = 0

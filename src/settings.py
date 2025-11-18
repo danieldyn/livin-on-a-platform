@@ -4,6 +4,7 @@ This module is meant to be shared by others, avoiding cross-import errors.
 """
 from pygame import display
 from pygame import mixer
+import storage
 # import 'sub'classes
 
 # constants
@@ -30,6 +31,10 @@ mixer.init()
 mixer.music.load('../brackeys_platformer_assets/music/game_level_music.wav')
 volume = mixer.music.get_volume()
 mixer.music.set_volume(volume - 0.5) # test option
+
+# persistent JSON files
+highscores = storage.load_highscores()
+savefile = storage.load_save()
 
 # menu texts
 instructions = [
@@ -93,4 +98,11 @@ story_hint = [
     "              I",
     "              I",
     "<---------",
+]
+
+feats_hint = [
+    "                               ^",
+    "                               I",
+    "                               I",
+    "Check out your records!"
 ]

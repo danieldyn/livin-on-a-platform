@@ -3,8 +3,9 @@ Main entry point for the platformer game.
 Initialises Pygame, handles menu logic and states using two fundamental classes.
 """
 import pygame
+import storage
 from settings import screen, SCREEN_WIDTH, SCREEN_HEIGHT, FPS
-from states import MainMenu, HelpScreen, StoryScreen, Gameplay
+from states import MainMenu, HelpScreen, StoryScreen, Gameplay, FeatsScreen
 from buttons import Button
 
 class Game():
@@ -26,8 +27,12 @@ class Game():
             "main_menu": MainMenu(self),
             "help": HelpScreen(self),
             "story": StoryScreen(self),
+            "feats": FeatsScreen(self),
             "gameplay": Gameplay(self),
         }
+
+        # Load save file
+        self.last_played_level = storage.load_save()
 
         # Set initial state to main menu
         self.state_name = "main_menu"

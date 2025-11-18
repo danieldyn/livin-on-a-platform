@@ -2,9 +2,9 @@
 A method that handles the game's levels.
 """
 import pygame
-import score
+import storage
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
-from settings import screen, mixer
+from settings import screen, mixer, highscores
 from character import player
 from worlds import world_main_menu, reset_world
 from buttons import Button
@@ -19,8 +19,6 @@ main_menu_button.get_img("button_images_01", 5, "png")
 
 next_button = Button(500, 700, "Next")
 next_button.get_img("button_images_01", 5, "png")
-
-highscores = score.load_highscores()
 
 class Level(SoundAssets):
     """
@@ -184,11 +182,12 @@ class Level(SoundAssets):
     def display_victory(self):
         """
         A method that hands over the control to display_ending after playing a victory sound".
-        Also handles highscore updating.
+        Also handles highscore updating and autosaving.
         """
         self.ending_time = pygame.time.get_ticks() - self.start_time
         # update highscore if necessary
-        score.update_highscores(self.idx, player.coins_collected * COIN_MULTIPLIER, highscores)
+        storage.update_highscores(self.idx, player.coins_collected * COIN_MULTIPLIER, highscores)
+        storage.new_save(self.idx)
         mixer.music.stop()
         SoundAssets.victory.play()
         self.state = "completed"
