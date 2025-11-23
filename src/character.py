@@ -3,9 +3,9 @@ A module that handles the game's character (player).
 """
 
 import pygame
-from settings import BLOCK_SIZE, SCREEN_HEIGHT, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
+from settings import BLOCK_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
 from settings import screen
-from objects import Object, CollectableObject, InteractableObject, EndOfLevelObject, DangerousObject, StaticObject, DecorationObject
+from objects import Object, Coin, Heart, CollectableObject, InteractableObject, EndOfLevelObject, DangerousObject, StaticObject, DecorationObject
 from sounds import SoundAssets
 
 class Player(SoundAssets):
@@ -36,6 +36,9 @@ class Player(SoundAssets):
         self.player_is_rolling = False
         self.coins_collected = 0
         self.jump_sound = pygame.mixer.Sound('../brackeys_platformer_assets/sounds/jump.wav')
+        self.lives = 3
+        self.last_hit_time = 0
+        self.hit_cooldown = 1500 # miliseconds
         self.player_is_alive = True
         self.completed_current_level = False
         self.dx = 0
@@ -48,6 +51,8 @@ class Player(SoundAssets):
         """
         self.player_rect.topleft = (self.starting_x, self.starting_y)
         self.coins_collected = 0
+        if self.lives == 0: # make sure it isn't used for level transition
+            self.lives = 3
         self.completed_current_level = False
 
     def get_img(self, sheet, width, height, color, row_number, number_of_images, list_of_images):
@@ -129,7 +134,10 @@ class Player(SoundAssets):
                     if isinstance(obj, CollectableObject):
                         if obj.object_is_usable:
                             obj.sound.play()
-                            self.coins_collected += 1 # avoid point farming after collecting the coin
+                            if isinstance(obj, Coin):
+                                self.coins_collected += 1 # avoid point farming after collecting the coin
+                            elif isinstance(obj, Heart) and self.lives < 3:
+                                self.lives += 1 
                         obj.object_is_usable = False # remove the object from screen
                     elif isinstance(obj, InteractableObject):
                         # interaction will happen when ENTER is pressed
@@ -142,10 +150,17 @@ class Player(SoundAssets):
                                 else: # it is a chest containing a fixed amount of coins
                                     self.coins_collected += obj.value
                     elif isinstance(obj, DangerousObject):
-                        if obj.sound != None:
-                            obj.sound.play()
-                        self.player_is_alive = False
-                    
+                        current_time = pygame.time.get_ticks()
+                        # check if the player is not in the invulnerable window
+                        if current_time - self.last_hit_time > self.hit_cooldown:
+                            if obj.sound != None:
+                                obj.sound.play()
+                            self.lives -= 1
+                            self.last_hit_time = current_time # timer reset
+                            if self.lives <= 0:
+                                self.player_is_alive = False
+                        else:
+                            pass
                     
         for obj in level_world.obj_list:
             obj : Object
@@ -205,13 +220,20 @@ class Player(SoundAssets):
                 self.player_rect.y += self.dy
                 self.player_rect.x += self.dx
 
+                # prevent the player from going off the screen horizontally
+                if self.player_rect.left < -BLOCK_SIZE / 2:
+                    self.player_rect.left = -BLOCK_SIZE / 2
+                elif self.player_rect.right > SCREEN_WIDTH + BLOCK_SIZE / 2:
+                    self.player_rect.right = SCREEN_WIDTH + BLOCK_SIZE / 2
+
             screen.blit(img_frame, self.player_rect)
 
             # check if player is on screen (after possible movement)
             if player.player_rect.y >= SCREEN_HEIGHT:
-                player.player_is_alive = False
+                self.lives = 0
+                self.player_is_alive = False
             else:
-                player.player_is_alive = True
+                self.player_is_alive = True
         else:
             pass
             

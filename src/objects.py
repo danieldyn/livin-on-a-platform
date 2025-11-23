@@ -153,4 +153,7 @@ class Spike(DangerousObject, SoundAssets):
         super().__init__(path_to_sheet, x, y, dx)
         self.sound = SoundAssets.hit
 
-# class Heart(Object) -> similar to coin (value = 0 / will add health_value)
+class Heart(CollectableObject):
+    def __init__(self, path_to_sheet, x, y, value):
+        super().__init__(path_to_sheet, x, y, value)
+        self.sound = SoundAssets.heart

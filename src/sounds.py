@@ -10,3 +10,4 @@ class SoundAssets(ABC, mixer.Sound):
     chest = mixer.Sound('../brackeys_platformer_assets/sounds/chest.wav')
     hit = mixer.Sound('../brackeys_platformer_assets/sounds/hit.mp3')
     menu_music = mixer.Sound('../brackeys_platformer_assets/sounds/background.mp3')
+    heart = mixer.Sound('../brackeys_platformer_assets/sounds/heart_sound.wav')

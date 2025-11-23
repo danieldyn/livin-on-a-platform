@@ -3,7 +3,7 @@ A module that handles the worlds in the game.
 """
 import pygame
 from settings import BLOCK_SIZE, screen
-from objects import Coin, Chest, DecorationObject, EndOfLevelObject, Slime, Spike, StaticObject
+from objects import Coin, Chest, DecorationObject, EndOfLevelObject, Slime, Spike, StaticObject, Heart
 
 class World():
     """
@@ -130,6 +130,13 @@ class World():
                     slime.get_object_image(24, 24, 1.35, (0, 0, 0), 2, 4, slime.object_img_list)
                     # 1.35 hardcoded value (gives the impression that the slime is touching the ground)
                     self.obj_list.append(slime)
+                if block == 'd':
+                    # heart
+                    heart_x = BLOCK_SIZE * col_count
+                    heart_y = BLOCK_SIZE * row_count
+                    heart = Heart('../ClassicPlatformerAssets/Heart/heartanim1.png', heart_x, heart_y, 0)
+                    heart.get_object_image(16, 16, 1.2, (0, 0, 0), 1, 1, heart.object_img_list)
+                    self.obj_list.append(heart)
                 col_count += 1
             row_count += 1
 

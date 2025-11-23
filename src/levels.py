@@ -110,6 +110,23 @@ class Level(SoundAssets):
         time_rect = time_surf.get_rect(center = (SCREEN_WIDTH - 150, 100))
         screen.blit(time_surf, time_rect)
 
+    def display_lives(self):
+        """
+        A method that displays the total amount of lives in the top left corner.
+        """
+        original_heart = pygame.image.load('../ClassicPlatformerAssets/Heart/heartanim1.png')
+        heart_full = pygame.transform.scale(original_heart, (40, 40))
+        heart_empty = heart_full.copy()
+        heart_empty.set_alpha(150) # make the heart greyed out
+
+        (x, y) = (30, 30)
+        for i in range(3):
+            if i < player.lives:
+                screen.blit(heart_full, (x, y))
+            else:
+                screen.blit(heart_empty, (x, y))
+            x += 50
+
     def display_ending(self):
         """
         A method that displays the ending menu on the entire screen.
@@ -120,6 +137,9 @@ class Level(SoundAssets):
         time = (int)(self.ending_time / 1000) # transform to seconds
         minutes = time // 60
         seconds = time % 60
+        score = score - minutes // 60 - seconds # adjust score depending on the time taken
+        if score < 0:
+            score = 0 # we don't accept negative scores here 
 
         bg_surf = pygame.image.load('../backgrounds/ending.jpg')
         bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -209,6 +229,7 @@ class Level(SoundAssets):
             else:
                 self.display_score() # layer 5
                 self.display_time() # layer 6
+                self.display_lives() # layer 7
 
         if player.completed_current_level and self.state != "completed":
             self.display_victory()

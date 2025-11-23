@@ -11,6 +11,7 @@ from worlds import world_level_01, world_level_02
 from settings import screen, instructions, story, play_hint, story_hint, help_hint, feats_hint
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK
 from sounds import SoundAssets
+from character import player
 
 class State(ABC):
     """
@@ -282,13 +283,15 @@ class Gameplay(State):
         # Initialise all levels in advance
         self.level_list = [Level(bg, world, idx) for bg, world, idx in self.world_sequence]
         # Determine which level will be run
-        if self.game.last_played_level == len(self.level_list):
-            self.game.last_played_level = 1
+        self.game.last_played_level = storage.load_save() # sync save file
+        if self.game.last_played_level >= len(self.level_list):
+            self.game.last_played_level = 0
 
-        self.level_idx = self.game.last_played_level - 1
+        self.level_idx = self.game.last_played_level
         if self.level_idx < 0:
             self.level_idx = 0
 
+        player.lives = 3
         self.current_level = self.level_list[self.level_idx]
         self.current_level.reset()
 
