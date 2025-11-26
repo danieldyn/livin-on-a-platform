@@ -9,9 +9,8 @@ from buttons import Button
 from levels import Level, main_menu
 from worlds import world_level_01, world_level_02
 from settings import screen, instructions, story, play_hint, story_hint, help_hint, feats_hint
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, BLOCK_SIZE
 from sounds import SoundAssets
-from character import player
 
 class State(ABC):
     """
@@ -62,6 +61,11 @@ class MainMenu(State):
         self.feats_button = Button(SCREEN_WIDTH - 150, 5, "Feats")
         self.feats_button.get_img("button_images_01", 5, "png")
 
+        self.quit_button = Button(5, 5, "Quit")
+        self.quit_button.get_img("button_images_01", 5, "png")
+
+        SoundAssets.menu_music.play(loops=-1) # play only once, upon instantiation
+
     def startup(self):
         """
         Entering the main menu.
@@ -71,7 +75,7 @@ class MainMenu(State):
         self.story_button.reset()
         self.help_button.reset()
         self.feats_button.reset()
-        SoundAssets.menu_music.play()
+        self.quit_button.reset()
 
     def update(self):
         """
@@ -107,6 +111,7 @@ class MainMenu(State):
         self.help_button.update()
         self.story_button.update()
         self.feats_button.update()
+        self.quit_button.update()
 
         if self.help_button.was_pressed >= 1:
             self.done = True
@@ -124,6 +129,9 @@ class MainMenu(State):
             self.done = True
             self.next_state = "gameplay"
             SoundAssets.menu_music.stop() # levels have a different soundtrack
+        
+        if self.quit_button.was_pressed >= 1:
+            self.game.running = False
 
         main_menu.display_update()
 
@@ -134,20 +142,24 @@ class HelpScreen(State):
     """
     def __init__(self, game):
         super().__init__(game)
+        self.bg = pygame.image.load('../backgrounds/help.jpg')
+        self.bg = pygame.transform.scale(self.bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.return_button = Button(620, 670, "Back")
+        self.return_button.get_img("button_images_01", 5, "png")
 
     def startup(self):
         """
         Entering the help menu.
         """
         # Reset return button to receive input
-        self.game.return_button.reset()
+        self.return_button.reset()
 
     def update(self):
         """
         Updates buttons, draws everything and checks for transition.
         """
         # Draw the paragraphs and the background
-        screen.blit(self.game.alt_bg, (0, 0))
+        screen.blit(self.bg, (0, 0))
         y = 140
         for line in instructions:
             text = self.game.text_font.render(line, True, WHITE)
@@ -158,8 +170,8 @@ class HelpScreen(State):
             y = y + 40
 
         # Wait for the user to want to return to the main menu
-        self.game.return_button.update()
-        if self.game.return_button.was_pressed >= 1:
+        self.return_button.update()
+        if self.return_button.was_pressed >= 1:
             self.done = True
             self.next_state = "main_menu"
 
@@ -172,20 +184,24 @@ class StoryScreen(State):
     """
     def __init__(self, game):
         super().__init__(game)
+        self.bg = pygame.image.load('../backgrounds/story.jpg')
+        self.bg = pygame.transform.scale(self.bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.return_button = Button(750, 673, "Back")
+        self.return_button.get_img("button_images_01", 5, "png")
 
     def startup(self):
         """
         Entering the story menu.
         """
         # Reset the return button to receive input
-        self.game.return_button.reset()
+        self.return_button.reset()
 
     def update(self):
         """
         Updates buttons, draws everything and checks for transition.
         """
         # Draw the paragraphs and the background
-        screen.blit(self.game.alt_bg, (0, 0))
+        screen.blit(self.bg, (0, 0))
         y = 140
         for line in story:
             text = self.game.text_font.render(line, True, WHITE)
@@ -196,8 +212,8 @@ class StoryScreen(State):
             y = y + 40
 
         # Wait for the user to want to return to the main menu
-        self.game.return_button.update()
-        if self.game.return_button.was_pressed >= 1:
+        self.return_button.update()
+        if self.return_button.was_pressed >= 1:
             self.done = True
             self.next_state = "main_menu"
 
@@ -210,20 +226,24 @@ class FeatsScreen(State):
     """
     def __init__(self, game):
         super().__init__(game)
+        self.bg = pygame.image.load('../backgrounds/feats.jpg')
+        self.bg = pygame.transform.scale(self.bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.return_button = Button(750, 673, "Back")
+        self.return_button.get_img("button_images_01", 5, "png")
 
     def startup(self):
         """
         Entering the feats menu.
         """
         # Reset the return button to receive input
-        self.game.return_button.reset()
+        self.return_button.reset()
 
     def update(self):
         """
         Updates buttons, draws everything and checks for transition.
         """
         # Draw the paragraphs and the background
-        screen.blit(self.game.alt_bg, (0, 0))
+        screen.blit(self.bg, (0, 0))
         y = 140
         text = self.game.text_font.render("Level Highscores", True, WHITE)
         text_surf = pygame.Surface((text.get_width(), text.get_height()), pygame.SRCALPHA)
@@ -253,8 +273,8 @@ class FeatsScreen(State):
         screen.blit(text, (200, 700))
 
         # Wait for the user to want to return to the main menu
-        self.game.return_button.update()
-        if self.game.return_button.was_pressed >= 1:
+        self.return_button.update()
+        if self.return_button.was_pressed >= 1:
             self.done = True
             self.next_state = "main_menu"
 
@@ -269,8 +289,8 @@ class Gameplay(State):
         super().__init__(game)
         # Initialise the sequence of worlds, backgrounds and indices once
         self.world_sequence = [
-            ("../backgrounds/sky.jpg", world_level_01, 1),
-            ("../backgrounds/sky.jpg", world_level_02, 2)
+            ("../backgrounds/sky.jpg", world_level_01, 1, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../backgrounds/sky.jpg", world_level_02, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
         ]
         self.level_list = []
         self.level_idx = 0
@@ -281,7 +301,8 @@ class Gameplay(State):
         Entering the gameplay state (pressed Start in main menu)
         """
         # Initialise all levels in advance
-        self.level_list = [Level(bg, world, idx) for bg, world, idx in self.world_sequence]
+        self.level_list = [Level(bg, world, idx, start_x, start_y)
+                            for bg, world, idx, start_x, start_y in self.world_sequence]
         # Determine which level will be run
         self.game.last_played_level = storage.load_save() # sync save file
         if self.game.last_played_level >= len(self.level_list):
@@ -291,7 +312,6 @@ class Gameplay(State):
         if self.level_idx < 0:
             self.level_idx = 0
 
-        player.lives = 3
         self.current_level = self.level_list[self.level_idx]
         self.current_level.reset()
 
@@ -306,9 +326,11 @@ class Gameplay(State):
             # The current level ended (Win or Lose)
             if self.current_level.state == "next" and self.level_idx + 1 < len(self.level_list):
                 # Move to the next level
+                current_lives = self.current_level.player.lives
                 self.level_idx += 1
                 self.current_level = self.level_list[self.level_idx]
                 self.current_level.reset()
+                self.current_level.player.lives = current_lives
             else:
                 # Check if the player finished the game
                 if self.level_idx + 1 >= len(self.level_list) and self.current_level.state == "next":
@@ -325,7 +347,7 @@ class Gameplay(State):
                 # Lost, exited, or finished victory screen
                 self.done = True
                 self.next_state = "main_menu"
-                SoundAssets.menu_music.play()
+                SoundAssets.menu_music.play(loops=-1)
 
     def cleanup(self):
         """

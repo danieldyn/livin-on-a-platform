@@ -52,7 +52,7 @@ instructions = [
     "Press Enter to collect Chests and touch the Flag.",
     "Left click on buttons to interact with them.",
     "",
-    "Ready to play now? --------------->"
+    "Ready to play now? ------->"
 ]
 
 story = [

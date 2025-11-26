@@ -137,6 +137,20 @@ class World():
                     heart = Heart('../ClassicPlatformerAssets/Heart/heartanim1.png', heart_x, heart_y, 0)
                     heart.get_object_image(16, 16, 1.2, (0, 0, 0), 1, 1, heart.object_img_list)
                     self.obj_list.append(heart)
+                if block == 'e':
+                    # mushroom
+                    shroom_x = BLOCK_SIZE * col_count
+                    shroom_y = BLOCK_SIZE * row_count
+                    shroom = DecorationObject('../ClassicPlatformerAssets/Props/shroom.png', shroom_x, shroom_y)
+                    shroom.get_object_image(32, 32, 1, (0, 0, 0), 1, 1, shroom.object_img_list)
+                    self.obj_list.append(shroom)
+                if block == 'f':
+                    # flower
+                    flower_x = BLOCK_SIZE * col_count
+                    flower_y = BLOCK_SIZE * row_count
+                    flower = DecorationObject('../ClassicPlatformerAssets/Props/flower.png', flower_x, flower_y)
+                    flower.get_object_image(32, 32, 1, (0, 0, 0), 1, 1, flower.object_img_list)
+                    self.obj_list.append(flower)
                 col_count += 1
             row_count += 1
 

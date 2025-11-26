@@ -43,6 +43,11 @@ class Player(SoundAssets):
         self.completed_current_level = False
         self.dx = 0
         self.dy = 0
+        # animations
+        self.get_img(self.img, 32, 32, (0, 0, 0), 3, 8, self.running_img_list)
+        self.get_img(self.img, 32, 32, (0, 0, 0), 6, 8, self.rolling_img_list)
+        self.get_img(self.img, 32, 32, (0, 0, 0), 1, 4, self.idle_image_list)
+        self.get_img(self.img, 32, 32, (0, 0, 0), 8, 4, self.death_img_list)
 
     def reset(self):
         """
@@ -108,7 +113,11 @@ class Player(SoundAssets):
         if keys[pygame.K_SPACE]:
             if self.can_jump:
                 self.jump_sound.play()
-                self.player_gravity = -15
+                self.player_gravity = -12
+                # physics: Max Height Calculation: 1 + 2 + .. + 12 = 78 pixels
+                # block height: 78px / 16px approx 4.875 blocks
+                # 4-block high jumps will feel completely safe and reliable (clear by about 14 pixels)
+                # 5-block high jumps will miss by 2 pixels
                 self.dy = self.player_gravity
                 self.can_jump = False # prevent button mashing and multi jumps
 
@@ -226,25 +235,20 @@ class Player(SoundAssets):
                 elif self.player_rect.right > SCREEN_WIDTH + BLOCK_SIZE / 2:
                     self.player_rect.right = SCREEN_WIDTH + BLOCK_SIZE / 2
 
-            screen.blit(img_frame, self.player_rect)
+            # check for last hit to display normal animation or "flickering" 
+            current_time = pygame.time.get_ticks()
+
+            if current_time - self.last_hit_time < self.hit_cooldown:
+                if (current_time // 200) % 2 == 0:
+                    screen.blit(img_frame, self.player_rect)
+            else:
+                screen.blit(img_frame, self.player_rect)
 
             # check if player is on screen (after possible movement)
-            if player.player_rect.y >= SCREEN_HEIGHT:
+            if self.player_rect.y >= SCREEN_HEIGHT:
                 self.lives = 0
                 self.player_is_alive = False
             else:
                 self.player_is_alive = True
         else:
             pass
-            
-
-# player
-player = Player(7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
-# getting running images
-player.get_img(player.img, 32, 32, (0, 0, 0), 3, 8, player.running_img_list)
-# getting rolling images
-player.get_img(player.img, 32, 32, (0, 0, 0), 6, 8, player.rolling_img_list)
-# getting idle images
-player.get_img(player.img, 32, 32, (0, 0, 0), 1, 4, player.idle_image_list)
-# death animation
-player.get_img(player.img, 32, 32, (0, 0, 0), 8, 4, player.death_img_list)

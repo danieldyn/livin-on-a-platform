@@ -5,7 +5,7 @@ import pygame
 import storage
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
 from settings import screen, mixer, highscores
-from character import player
+from character import Player
 from worlds import world_main_menu, reset_world
 from buttons import Button
 from objects import Object
@@ -26,7 +26,7 @@ class Level(SoundAssets):
     The level contains a world and the player.
     The level has its own clock and score, based on performance.
     """
-    def __init__(self, bg_img, world, idx):
+    def __init__(self, bg_img, world, idx, start_x, start_y):
         self.running = True
         self.idx = idx
         bg_surf = pygame.image.load(bg_img)
@@ -39,6 +39,9 @@ class Level(SoundAssets):
         self.fallen_buttons = False
         self.main_menu_button = None
         self.restart_button = None
+        self.start_x = start_x
+        self.start_y = start_y
+        self.player = Player(start_x, start_y)
 
     def reset(self):
         """
@@ -48,8 +51,8 @@ class Level(SoundAssets):
         """
         self.start_time = pygame.time.get_ticks()
         self.state = "playing"
-        player.player_is_alive = True
-        player.reset()
+        self.player.player_is_alive = True
+        self.player.reset()
         mixer.music.rewind()
         mixer.music.play()
         restart_button.reset()
@@ -70,7 +73,7 @@ class Level(SoundAssets):
         """
         A wrapper method that simply updates the player.
         """
-        player.update(self.world)
+        self.player.update(self.world)
 
     def display_objects(self):
         """
@@ -91,7 +94,7 @@ class Level(SoundAssets):
         A method that displays the score in the top right corner.
         """
         score_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 25)
-        score = player.coins_collected * 10
+        score = self.player.coins_collected * 10
         score_surf = score_font.render(f'Score: {score}', True, (64, 64, 64))
         score_rect = score_surf.get_rect(center = (SCREEN_WIDTH - 150, 50))
         screen.blit(score_surf, score_rect)
@@ -121,7 +124,7 @@ class Level(SoundAssets):
 
         (x, y) = (30, 30)
         for i in range(3):
-            if i < player.lives:
+            if i < self.player.lives:
                 screen.blit(heart_full, (x, y))
             else:
                 screen.blit(heart_empty, (x, y))
@@ -133,7 +136,7 @@ class Level(SoundAssets):
         Depending on the states "fallen" and "completed", a different menu is displayed.
         """
         ending_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 45)
-        score = player.coins_collected * COIN_MULTIPLIER
+        score = self.player.coins_collected * COIN_MULTIPLIER
         time = (int)(self.ending_time / 1000) # transform to seconds
         minutes = time // 60
         seconds = time % 60
@@ -186,9 +189,9 @@ class Level(SoundAssets):
         A method that displays the player's death image.
         Following this, the function hands over the control to display_ending.
         """
-        player.death_img_index += 0.1
-        if player.death_img_index >= len(player.death_img_list):
-            player.death_img_index = 0
+        self.player.death_img_index += 0.1
+        if self.player.death_img_index >= len(self.player.death_img_list):
+            self.player.death_img_index = 0
             self.state = "fallen" # after the death animation, treat the rest as the fallen case
             self.ending_time = pygame.time.get_ticks() - self.start_time
             pygame.time.delay(200) # avoid making the transition very sudden
@@ -196,8 +199,8 @@ class Level(SoundAssets):
             SoundAssets.loss.play()
             return
 
-        img_frame = player.death_img_list[int(player.death_img_index)][0] # the surface
-        screen.blit(img_frame, player.player_rect)
+        img_frame = self.player.death_img_list[int(self.player.death_img_index)][0] # the surface
+        screen.blit(img_frame, self.player.player_rect)
 
     def display_victory(self):
         """
@@ -206,7 +209,7 @@ class Level(SoundAssets):
         """
         self.ending_time = pygame.time.get_ticks() - self.start_time
         # update highscore if necessary
-        storage.update_highscores(self.idx, player.coins_collected * COIN_MULTIPLIER, highscores)
+        storage.update_highscores(self.idx, self.player.coins_collected * COIN_MULTIPLIER, highscores)
         storage.new_save(self.idx)
         mixer.music.stop()
         SoundAssets.victory.play()
@@ -223,7 +226,7 @@ class Level(SoundAssets):
             self.display_objects() # layer 2
             self.display_player() # layer 3
 
-            if not player.player_is_alive:
+            if not self.player.player_is_alive:
                 self.state = "dead"
 
             else:
@@ -231,7 +234,7 @@ class Level(SoundAssets):
                 self.display_time() # layer 6
                 self.display_lives() # layer 7
 
-        if player.completed_current_level and self.state != "completed":
+        if self.player.completed_current_level and self.state != "completed":
             self.display_victory()
 
         if self.state == "dead":
@@ -245,4 +248,5 @@ class Level(SoundAssets):
 
         self.display_update() # go back to layer 1
 
-main_menu = Level('../backgrounds/sky.jpg', world_main_menu, 0)
+# special instantiation to be used separately
+main_menu = Level('../backgrounds/sky.jpg', world_main_menu, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)

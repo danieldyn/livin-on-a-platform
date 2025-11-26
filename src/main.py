@@ -4,9 +4,8 @@ Initialises Pygame, handles menu logic and states using two fundamental classes.
 """
 import pygame
 import storage
-from settings import screen, SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+from settings import screen, FPS
 from states import MainMenu, HelpScreen, StoryScreen, Gameplay, FeatsScreen
-from buttons import Button
 
 class Game():
     """
@@ -44,10 +43,6 @@ class Game():
         A method that loads assets that are used across multiple states.
         """
         self.text_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8.ttf', 20)
-        self.alt_bg = pygame.image.load('../backgrounds/story.jpg')
-        self.alt_bg = pygame.transform.scale(self.alt_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.return_button = Button(750, 673, "Back")
-        self.return_button.get_img("button_images_01", 5, "png")
 
     def handle_events(self):
         """
