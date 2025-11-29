@@ -11,3 +11,6 @@
 - `a` <=> tree
 - `b` <=> end of level flag
 - `c` <=> enemy (slime)
+- `d` <=> heart
+- `e` <=> mushroom
+- `f` <=> flower

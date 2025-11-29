@@ -1,7 +1,7 @@
-All assets in the pack have been repackaged and many have been modified by Brackeys.
+Several assets in the pack have been repackaged and many have been modified by Brackeys.
 
 
-LICENSE for all assets:
+LICENSE for these assets:
 
 Creative Commons Zero (CC0)
 

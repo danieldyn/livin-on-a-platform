@@ -3,9 +3,11 @@ A module that handles the game's character (player).
 """
 
 import pygame
-from settings import BLOCK_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
+from settings import BLOCK_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
+from settings import ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
 from settings import screen
-from objects import Object, Coin, Heart, CollectableObject, InteractableObject, EndOfLevelObject, DangerousObject, StaticObject, DecorationObject
+from objects import Object, CollectableObject, InteractableObject, DangerousObject, StaticObject, DecorationObject
+from objects import Coin, Heart, EndOfLevelObject
 from sounds import SoundAssets
 
 class Player(SoundAssets):
@@ -30,12 +32,12 @@ class Player(SoundAssets):
         self.idle_image_list = []
         self.death_img_list = []
         # relevant in-game aspects
-        self.img = pygame.image.load('../brackeys_platformer_assets/sprites/knight.png').convert_alpha()
+        self.img = pygame.image.load('../assets/sprites/knight.png').convert_alpha()
         self.player_rect = pygame.rect.Rect(self.starting_x, self.starting_y, self.player_width, self.player_height)
         self.can_jump = True
         self.player_is_rolling = False
         self.coins_collected = 0
-        self.jump_sound = pygame.mixer.Sound('../brackeys_platformer_assets/sounds/jump.wav')
+        self.jump_sound = pygame.mixer.Sound('../assets/sounds/jump.wav')
         self.lives = 3
         self.last_hit_time = 0
         self.hit_cooldown = 1500 # miliseconds
@@ -74,7 +76,6 @@ class Player(SoundAssets):
             img_rect = img.get_rect()
             image = (img, img_rect, player_mask)
             list_of_images.append(image)
-            
 
     def update(self, level_world):
         """
@@ -146,7 +147,7 @@ class Player(SoundAssets):
                             if isinstance(obj, Coin):
                                 self.coins_collected += 1 # avoid point farming after collecting the coin
                             elif isinstance(obj, Heart) and self.lives < 3:
-                                self.lives += 1 
+                                self.lives += 1
                         obj.object_is_usable = False # remove the object from screen
                     elif isinstance(obj, InteractableObject):
                         # interaction will happen when ENTER is pressed
@@ -162,7 +163,7 @@ class Player(SoundAssets):
                         current_time = pygame.time.get_ticks()
                         # check if the player is not in the invulnerable window
                         if current_time - self.last_hit_time > self.hit_cooldown:
-                            if obj.sound != None:
+                            if obj.sound is not None:
                                 obj.sound.play()
                             self.lives -= 1
                             self.last_hit_time = current_time # timer reset
@@ -170,7 +171,7 @@ class Player(SoundAssets):
                                 self.player_is_alive = False
                         else:
                             pass
-                    
+
         for obj in level_world.obj_list:
             obj : Object
 
@@ -180,7 +181,6 @@ class Player(SoundAssets):
             obj_mask = img[2] # the mask of the block
 
             if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x - self.dx, obj.obj_rect.y - self.player_rect.y - self.dy)):
-
                 is_corner = False
 
                 # going horizontally
@@ -235,7 +235,7 @@ class Player(SoundAssets):
                 elif self.player_rect.right > SCREEN_WIDTH + BLOCK_SIZE / 2:
                     self.player_rect.right = SCREEN_WIDTH + BLOCK_SIZE / 2
 
-            # check for last hit to display normal animation or "flickering" 
+            # check for last hit to display normal animation or "flickering" one
             current_time = pygame.time.get_ticks()
 
             if current_time - self.last_hit_time < self.hit_cooldown:

@@ -28,7 +28,7 @@ screen = display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 mixer.init()
 
 # background music for levels
-mixer.music.load('../brackeys_platformer_assets/music/game_level_music.wav')
+mixer.music.load('../assets/music/game_level_music.wav')
 volume = mixer.music.get_volume()
 mixer.music.set_volume(volume - 0.5) # test option
 
@@ -39,18 +39,40 @@ savefile = storage.load_save()
 # menu texts
 instructions = [
     "Game Instructions",
+    "",
     "Make your way through the worlds as quickly and",
     "as efficiently as possible. Your performance will",
     "be evaluated based on completion time and the",
     "amount of coins collected on the way. Think your",
-    "approach carefully, as some treasures are guarded",
+    "approach carefully, as some pathways are guarded",
     "by deadly traps and elusive enemies!",
     "",
     "Controls",
+    "",
     "Move the player using Right Arrow and Left Arrow.",
     "Press Space to jump and Right Shift to roll.",
     "Press Enter to collect Chests and touch the Flag.",
     "Left click on buttons to interact with them.",
+    "",
+    "Find out more ------------>"
+]
+
+features = [
+    "Game Features - What to expect",
+    "",
+    "You will have a maximum of 3 lives, which carry on",
+    "between levels - every mistake counts! Watch out for",
+    "hearts you can collect along the way. Being hit will",
+    "grant you 2 seconds of invulnerability to bounce back.",
+    "",
+    "Chests can be a great source of bonus coins, make sure",
+    "you interact with them using Enter. It won't always be",
+    "easy to get to them. Also, they never award bonus hearts.",
+    "",
+    "Your progress is automatically saved when completing a",
+    "level. By default, the Start button in the main menu will",
+    "launch the level after the last completed one, if any. You",
+    "can freely reset and start fresh using the Reset button.",
     "",
     "Ready to play now? ------->"
 ]
@@ -75,7 +97,7 @@ story = [
 ]
 
 play_hint = [
-    "Press to begin!",
+    "Press to play!",
     "          I",
     "          I",
     "          I",
@@ -105,4 +127,10 @@ feats_hint = [
     "                               I",
     "                               I",
     "Check out your records!"
+]
+
+reset_hint = [
+    "                                             ^",
+    "                                             |",
+    "Want to reset your save? -----"
 ]

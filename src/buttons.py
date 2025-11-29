@@ -25,6 +25,7 @@ class Button(SoundAssets):
     def reset(self):
         """
         A method that resets a button.
+        Best called before update() to get the button back to the initial state.
         """
         self.was_pressed = 0
         self.can_press_button = True
@@ -35,7 +36,7 @@ class Button(SoundAssets):
         A method that completes a button's image list.
         """
         for i in range(1, number_of_image_files + 1):
-            img_surf = pygame.image.load(f"../buttons/{directory}/img{i:02}.{image_file_type}").convert_alpha()
+            img_surf = pygame.image.load(f"../assets/buttons/{directory}/img{i:02}.{image_file_type}").convert_alpha()
             # scale
             # img_surf = pygame.transform.scale(img_surf, (self.button_width * scale, self.button_height * scale))
             # self.button_width = self.button_width * scale
@@ -45,7 +46,7 @@ class Button(SoundAssets):
 
             # add text to button
             pygame.font.init()
-            text_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 25)
+            text_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 25)
             text_surf = text_font.render(self.text_on_button, True, (20, 20, 20))
             text_rect = text_surf.get_rect(center=img_rect.center) # for positioning
 
@@ -57,6 +58,7 @@ class Button(SoundAssets):
     def update(self):
         """
         A method that updates a button.
+        Also handles drawing it on the screen.
         """
         mouse_coordinates = (mouse_x, mouse_y) = pygame.mouse.get_pos()
         first_button_img = self.button_img_list[0][1] # the mask

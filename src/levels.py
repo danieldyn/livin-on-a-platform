@@ -6,7 +6,7 @@ import storage
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
 from settings import screen, mixer, highscores
 from character import Player
-from worlds import world_main_menu, reset_world
+from worlds import reset_world
 from buttons import Button
 from objects import Object
 from sounds import SoundAssets
@@ -24,7 +24,7 @@ class Level(SoundAssets):
     """
     A class that implements a level.
     The level contains a world and the player.
-    The level has its own clock and score, based on performance.
+    It also has its own clock and score, based on performance.
     """
     def __init__(self, bg_img, world, idx, start_x, start_y):
         self.running = True
@@ -93,7 +93,7 @@ class Level(SoundAssets):
         """
         A method that displays the score in the top right corner.
         """
-        score_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 25)
+        score_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 25)
         score = self.player.coins_collected * 10
         score_surf = score_font.render(f'Score: {score}', True, (64, 64, 64))
         score_rect = score_surf.get_rect(center = (SCREEN_WIDTH - 150, 50))
@@ -103,7 +103,7 @@ class Level(SoundAssets):
         """
         A method that displays the time in the top right corner.
         """
-        time_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 25)
+        time_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 25)
         time = pygame.time.get_ticks() - self.start_time
         time = (int)(time / 1000) # transform to seconds
         minutes = (int)(time / 60)
@@ -117,7 +117,7 @@ class Level(SoundAssets):
         """
         A method that displays the total amount of lives in the top left corner.
         """
-        original_heart = pygame.image.load('../ClassicPlatformerAssets/Heart/heartanim1.png')
+        original_heart = pygame.image.load('../assets/Heart/heartanim1.png')
         heart_full = pygame.transform.scale(original_heart, (40, 40))
         heart_empty = heart_full.copy()
         heart_empty.set_alpha(150) # make the heart greyed out
@@ -135,16 +135,15 @@ class Level(SoundAssets):
         A method that displays the ending menu on the entire screen.
         Depending on the states "fallen" and "completed", a different menu is displayed.
         """
-        ending_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 45)
+        ending_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 45)
         score = self.player.coins_collected * COIN_MULTIPLIER
         time = (int)(self.ending_time / 1000) # transform to seconds
         minutes = time // 60
         seconds = time % 60
         score = score - minutes // 60 - seconds # adjust score depending on the time taken
-        if score < 0:
-            score = 0 # we don't accept negative scores here 
+        score = max(score, 0) # we don't accept negative scores here
 
-        bg_surf = pygame.image.load('../backgrounds/ending.jpg')
+        bg_surf = pygame.image.load('../assets/backgrounds/ending.jpg')
         bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         if self.state == "fallen":
@@ -247,6 +246,3 @@ class Level(SoundAssets):
             self.display_ending()
 
         self.display_update() # go back to layer 1
-
-# special instantiation to be used separately
-main_menu = Level('../backgrounds/sky.jpg', world_main_menu, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)

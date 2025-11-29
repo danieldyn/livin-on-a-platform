@@ -2,13 +2,13 @@
 A module that contains all states that the game can reach.
 These are meant to be used by main.py to control the flow of the game loop.
 """
+from abc import ABC, abstractmethod
 import pygame
 import storage
-from abc import ABC, abstractmethod
 from buttons import Button
-from levels import Level, main_menu
-from worlds import world_level_01, world_level_02
-from settings import screen, instructions, story, play_hint, story_hint, help_hint, feats_hint
+from levels import Level
+from worlds import create_world, world_level_01, world_level_02
+from settings import screen, instructions, features, story, play_hint, story_hint, help_hint, feats_hint, reset_hint
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, BLOCK_SIZE
 from sounds import SoundAssets
 
@@ -64,7 +64,16 @@ class MainMenu(State):
         self.quit_button = Button(5, 5, "Quit")
         self.quit_button.get_img("button_images_01", 5, "png")
 
-        SoundAssets.menu_music.play(loops=-1) # play only once, upon instantiation
+        self.reset_button = Button(472, 710, "Reset")
+        self.reset_button.get_img("button_images_01", 5, "png")
+
+        # Play music once, upon instantiation
+        SoundAssets.menu_music.play(loops=-1)
+
+        # Store main menu world inside a Level object
+        world_main_menu = create_world("../assets/worlds/main_menu.txt")
+        self.level_instance = Level('../assets/backgrounds/sky.jpg', world_main_menu, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
 
     def startup(self):
         """
@@ -76,13 +85,14 @@ class MainMenu(State):
         self.help_button.reset()
         self.feats_button.reset()
         self.quit_button.reset()
+        self.reset_button.reset()
 
     def update(self):
         """
         Updates buttons, draws everything and checks for transition.
         """
-        main_menu.display_world()
-        main_menu.display_objects()
+        self.level_instance.display_world()
+        self.level_instance.display_objects()
 
         # Display hints using hardcoded values to fit well in the chosen background
         y = 500
@@ -105,6 +115,11 @@ class MainMenu(State):
             text = self.game.text_font.render(line, True, BLACK)
             screen.blit(text, (750, y))
             y = y + 25
+        y = 785
+        for line in reset_hint:
+            text = self.game.text_font.render(line, True, BLACK)
+            screen.blit(text, (80, y))
+            y = y + 25
 
         # Update buttons and check for input
         self.start_button.update()
@@ -112,6 +127,7 @@ class MainMenu(State):
         self.story_button.update()
         self.feats_button.update()
         self.quit_button.update()
+        self.reset_button.update()
 
         if self.help_button.was_pressed >= 1:
             self.done = True
@@ -120,7 +136,7 @@ class MainMenu(State):
         if self.story_button.was_pressed >= 1:
             self.done = True
             self.next_state = "story"
-        
+
         if self.feats_button.was_pressed >= 1:
             self.done = True
             self.next_state = "feats"
@@ -129,11 +145,15 @@ class MainMenu(State):
             self.done = True
             self.next_state = "gameplay"
             SoundAssets.menu_music.stop() # levels have a different soundtrack
-        
+
         if self.quit_button.was_pressed >= 1:
             self.game.running = False
 
-        main_menu.display_update()
+        if self.reset_button.was_pressed >= 1:
+            storage.new_save(0) # overwrite save file
+            reset_hint[2] = "Successfully reset save! -----"
+
+        self.level_instance.display_update()
 
 class HelpScreen(State):
     """
@@ -142,26 +162,29 @@ class HelpScreen(State):
     """
     def __init__(self, game):
         super().__init__(game)
-        self.bg = pygame.image.load('../backgrounds/help.jpg')
+        self.bg = pygame.image.load('../assets/backgrounds/help.jpg')
         self.bg = pygame.transform.scale(self.bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.return_button = Button(620, 670, "Back")
+        self.return_button = Button(620, 670, "Menu")
         self.return_button.get_img("button_images_01", 5, "png")
+        self.next_button = Button(620, 670, "Next")
+        self.next_button.get_img("button_images_01", 5, "png")
+        self.page = None
 
     def startup(self):
         """
         Entering the help menu.
         """
-        # Reset return button to receive input
+        self.page = 1 # Enter the menu on the first page
+        # Reset the buttons to receive input
         self.return_button.reset()
+        self.next_button.reset()
 
-    def update(self):
+    def draw_text(self, source):
         """
-        Updates buttons, draws everything and checks for transition.
+        Draws the lines of text from source with proper alignment and partially transparent background.
         """
-        # Draw the paragraphs and the background
-        screen.blit(self.bg, (0, 0))
-        y = 140
-        for line in instructions:
+        y = 60
+        for line in source:
             text = self.game.text_font.render(line, True, WHITE)
             text_surf = pygame.Surface((text.get_width(), text.get_height()), pygame.SRCALPHA)
             text_surf.fill((0, 0, 0, 158)) # partially transparent background
@@ -169,11 +192,26 @@ class HelpScreen(State):
             screen.blit(text, (200, y))
             y = y + 40
 
-        # Wait for the user to want to return to the main menu
-        self.return_button.update()
-        if self.return_button.was_pressed >= 1:
-            self.done = True
-            self.next_state = "main_menu"
+    def update(self):
+        """
+        Updates buttons, draws everything and checks for transition.
+        """
+        # Draw the background and choose paragraph depending on page number
+        screen.blit(self.bg, (0, 0))
+        if self.page == 1:
+            self.draw_text(instructions)
+            # Wait for the user to want to go to the next page
+            self.next_button.update()
+            if self.next_button.was_pressed >= 1:
+                self.page = 2
+
+        elif self.page == 2:
+            self.draw_text(features)
+            # Wait for the user to want to return to the main menu or the other page
+            self.return_button.update()
+            if self.return_button.was_pressed >= 1:
+                self.done = True
+                self.next_state = "main_menu"
 
         pygame.display.update()
 
@@ -184,7 +222,7 @@ class StoryScreen(State):
     """
     def __init__(self, game):
         super().__init__(game)
-        self.bg = pygame.image.load('../backgrounds/story.jpg')
+        self.bg = pygame.image.load('../assets/backgrounds/story.jpg')
         self.bg = pygame.transform.scale(self.bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.return_button = Button(750, 673, "Back")
         self.return_button.get_img("button_images_01", 5, "png")
@@ -226,7 +264,7 @@ class FeatsScreen(State):
     """
     def __init__(self, game):
         super().__init__(game)
-        self.bg = pygame.image.load('../backgrounds/feats.jpg')
+        self.bg = pygame.image.load('../assets/backgrounds/feats.jpg')
         self.bg = pygame.transform.scale(self.bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.return_button = Button(750, 673, "Back")
         self.return_button.get_img("button_images_01", 5, "png")
@@ -251,7 +289,7 @@ class FeatsScreen(State):
         screen.blit(text_surf, (200, y))
         screen.blit(text, (200, y))
         y = y + 80
-        
+
         x = 200
         highscores = storage.highscores_to_string()
         for score in highscores:
@@ -289,8 +327,8 @@ class Gameplay(State):
         super().__init__(game)
         # Initialise the sequence of worlds, backgrounds and indices once
         self.world_sequence = [
-            ("../backgrounds/sky.jpg", world_level_01, 1, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
-            ("../backgrounds/sky.jpg", world_level_02, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
+            ("../assets/backgrounds/sky.jpg", world_level_01, 1, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_02, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
         ]
         self.level_list = []
         self.level_idx = 0
@@ -309,8 +347,7 @@ class Gameplay(State):
             self.game.last_played_level = 0
 
         self.level_idx = self.game.last_played_level
-        if self.level_idx < 0:
-            self.level_idx = 0
+        self.level_idx = max(self.level_idx, 0)
 
         self.current_level = self.level_list[self.level_idx]
         self.current_level.reset()
@@ -334,10 +371,10 @@ class Gameplay(State):
             else:
                 # Check if the player finished the game
                 if self.level_idx + 1 >= len(self.level_list) and self.current_level.state == "next":
-                    ending_font = pygame.font.Font('../brackeys_platformer_assets/fonts/PixelOperator8-Bold.ttf', 45)
-                    bg_surf = pygame.image.load('../backgrounds/ending.jpg')
+                    ending_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 45)
+                    bg_surf = pygame.image.load('../assets/backgrounds/ending.jpg')
                     bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
-                    ending_surf = ending_font.render(f'You have finished the game!', True, (64, 64, 64))
+                    ending_surf = ending_font.render('You have finished the game!', True, (64, 64, 64))
                     ending_rect = ending_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
                     screen.blit(bg_surf, (0, 0))
                     screen.blit(ending_surf, ending_rect)

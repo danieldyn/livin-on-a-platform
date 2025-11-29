@@ -1,10 +1,9 @@
 """
 A module that handles the objects in the game.
 """
-import pygame
 from abc import ABC, abstractmethod
+import pygame
 from sounds import SoundAssets
-from typing import override
 from settings import screen, OBJECT_IMAGE_INCREMENT
 
 class Object(ABC):
@@ -16,11 +15,11 @@ class Object(ABC):
     def __init__(self, path_to_sheet, x, y): # x, y -> placement
         self.object_sheet = pygame.image.load(path_to_sheet)
         self.object_img_list = []
-        self.object_img_index = 0 
+        self.object_img_index = 0
         self.object_is_usable = True
         self.sound : SoundAssets = None
-        self.obj_width = 16 
-        self.obj_height = 16 
+        self.obj_width = 16
+        self.obj_height = 16
         self.obj_rect = pygame.rect.Rect(x, y, self.obj_width, self.obj_height)
 
     def get_object_image(self, width, height, scale, color, row_number, number_of_images, list_of_images):
@@ -44,14 +43,17 @@ class Object(ABC):
         If the object cannot interact with the player, then the animation can be played in a loop.
         Else, wait for player input.
         """
-        pass
 
 class InteractableObject(Object, SoundAssets):
-    def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions):
+    """
+    A class that implements an object that the player can interact with using Enter.
+    The parameter value refers to the equivalent in Coins. Can support multiple interactions.
+    """
+    def __init__(self, path_to_sheet, x, y, value, number_of_interactions):
         super().__init__(path_to_sheet, x, y)
         self.value = value
         self.sound = None
-        self.number_of_interactions = numeber_of_interactions
+        self.number_of_interactions = number_of_interactions
 
     def object_animation(self):
         if not self.object_is_usable and self.number_of_interactions > 0: # if object is not usable, then it is being used
@@ -68,13 +70,17 @@ class InteractableObject(Object, SoundAssets):
             screen.blit(self.object_img_list[last][0], self.obj_rect)
         else:
             screen.blit(self.object_img_list[0][0], self.obj_rect)
-        
+
 class CollectableObject(Object, SoundAssets):
+    """
+    A class that implements an object that the player can collect by direct collision.
+    The parameter value refers to the equivalent in Coins.
+    """
     def __init__(self, path_to_sheet, x, y, value):
         super().__init__(path_to_sheet, x, y)
         self.sound = None
         self.value = value
-    
+
     def object_animation(self):
         if self.object_is_usable:
             self.object_img_index += OBJECT_IMAGE_INCREMENT
@@ -85,34 +91,42 @@ class CollectableObject(Object, SoundAssets):
         else:
             pass
 
-class DangerousObject(Object, SoundAssets): 
-        def __init__(self, path_to_sheet, x, y, dx=0): # by default it is imovable (dx=0)
-            super().__init__(path_to_sheet, x, y)
-            self.object_movement_range = (x - dx, x + dx)
-            self.dx = dx
-            self.direction = 1
-        def object_animation(self):
-            self.object_img_index += OBJECT_IMAGE_INCREMENT
-            if self.object_img_index >= len(self.object_img_list):
-                self.object_img_index = 0
-            
-            obj_surface = self.object_img_list[int(self.object_img_index)][0]
+class DangerousObject(Object, SoundAssets):
+    """
+    A class that implements an object that will hurt the player upon collision.
+    Unless specified via constructor parameter dx, the object will be immovable.
+    """
+    def __init__(self, path_to_sheet, x, y, dx=0):
+        super().__init__(path_to_sheet, x, y)
+        self.object_movement_range = (x - dx, x + dx)
+        self.dx = dx
+        self.direction = 1
+    def object_animation(self):
+        self.object_img_index += OBJECT_IMAGE_INCREMENT
+        if self.object_img_index >= len(self.object_img_list):
+            self.object_img_index = 0
 
-            if self.dx == 0:
-                # default mode -> imovable
-                screen.blit(obj_surface, self.obj_rect)
-            else:
-                # specific mode -> movable
-                self.obj_rect.x += 1 * self.direction
-                if self.obj_rect.x >= self.object_movement_range[1]:
-                    self.direction = -1
-                if self.obj_rect.x <= self.object_movement_range[0]:
-                    self.direction = 1
-                if self.direction == -1: # going left
-                    obj_surface = pygame.transform.flip(obj_surface, True, False).convert_alpha()
-                screen.blit(obj_surface, self.obj_rect)  
+        obj_surface = self.object_img_list[int(self.object_img_index)][0]
+
+        if self.dx == 0:
+            # default mode -> imovable
+            screen.blit(obj_surface, self.obj_rect)
+        else:
+            # specific mode -> movable
+            self.obj_rect.x += 1 * self.direction
+            if self.obj_rect.x >= self.object_movement_range[1]:
+                self.direction = -1
+            if self.obj_rect.x <= self.object_movement_range[0]:
+                self.direction = 1
+            if self.direction == -1: # going left
+                obj_surface = pygame.transform.flip(obj_surface, True, False).convert_alpha()
+            screen.blit(obj_surface, self.obj_rect)
 
 class StaticObject(Object): # it cannot be moved or crossed (i.e. block)
+    """
+    A class that implements an object that cannot be moved or crossed.
+    Player collisions with these objects will not be tested.
+    """
     def __init__(self, path_to_sheet, x, y):
         super().__init__(path_to_sheet, x, y)
 
@@ -123,37 +137,64 @@ class StaticObject(Object): # it cannot be moved or crossed (i.e. block)
         obj_surface = self.object_img_list[int(self.object_img_index)][0]
         screen.blit(obj_surface, self.obj_rect)
 
-class DecorationObject(StaticObject): # static object whose collision is not checked, thus it can be crossed, but not moved
-    def __init__(self, path_to_sheet, x, y): 
+class DecorationObject(StaticObject):
+    """
+    A class that implements a static object that is purely decorational.
+    """
+    def __init__(self, path_to_sheet, x, y):
         super().__init__(path_to_sheet, x, y)
 
 class EndOfLevelObject(InteractableObject):
+    """
+    A class that implements the end-of-level Flag.
+    The player needs to interact with it using Enter to finish the current level.
+    """
     def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
         super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
         self.sound = SoundAssets.victory
 
 class Coin(CollectableObject):
+    """
+    A class that implements a coin, worth 1 Coin in the game's economy.
+    """
     def __init__(self, path_to_sheet, x, y, value):
         super().__init__(path_to_sheet, x, y, value)
         self.sound = SoundAssets.coin
 
 class Chest(InteractableObject):
+    """
+    A class that implements a chest.
+    It has a variable equivalent in Coins, depending on how nice it looks.
+    """
     def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
         super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
         self.sound = SoundAssets.chest
 
-class Slime(DangerousObject):  
-    def __init__(self, path_to_sheet, x, y, dx=5): # by default the slime moves
+class Slime(DangerousObject):
+    """
+    A class that implements a slime enemy.
+    It's a mobile object that patrols around its own platform by default.
+    """
+    def __init__(self, path_to_sheet, x, y, dx=5):
         super().__init__(path_to_sheet, x, y, dx)
         self.slime_width = 64
         self.slime_height = 64
-
-class Spike(DangerousObject, SoundAssets):
-    def __init__(self, path_to_sheet, x, y, dx=0): # by default the spike doesn't move
-        super().__init__(path_to_sheet, x, y, dx)
         self.sound = SoundAssets.hit
 
+class Spike(DangerousObject, SoundAssets):
+    """
+    A class that implements a spike obstacle.
+    It's an immovable object placed on platforms by default.
+    """
+    def __init__(self, path_to_sheet, x, y, dx=0):
+        super().__init__(path_to_sheet, x, y, dx)
+        self.sound = SoundAssets.hurt
+
 class Heart(CollectableObject):
+    """
+    A class that implement a heart.
+    Collecting it will increase the player's maximum lives, if any are missing.
+    """
     def __init__(self, path_to_sheet, x, y, value):
         super().__init__(path_to_sheet, x, y, value)
         self.sound = SoundAssets.heart
