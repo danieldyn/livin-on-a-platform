@@ -198,3 +198,4 @@ def reset_world(path_to_world_data):
 world_level_01 = create_world("../assets/worlds/world1.txt")
 world_level_02 = create_world("../assets/worlds/world2.txt")
 secret_world = create_world("../assets/worlds/secret.txt")
+secret_world1 = create_world("../assets/worlds/secret1.txt")

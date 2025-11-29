@@ -7,7 +7,7 @@ import pygame
 import storage
 from buttons import Button
 from levels import Level
-from worlds import create_world, world_level_01, world_level_02, secret_world
+from worlds import create_world, world_level_01, world_level_02, secret_world, secret_world1
 from settings import screen, instructions, features, story, play_hint, story_hint, help_hint, feats_hint, reset_hint
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, BLOCK_SIZE
 from sounds import SoundAssets
@@ -332,7 +332,8 @@ class Gameplay(State):
         ]
         self.secret_world_sequence = [
             # The last level is only accesible by interacting with the All Powerful Acorn
-            ("../assets/backgrounds/sky.jpg", secret_world, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
+            ("../assets/backgrounds/sky.jpg", secret_world, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", secret_world1, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
         ]
         self.level_list = []
         self.secret_level_list = []
@@ -382,8 +383,8 @@ class Gameplay(State):
                     self.current_level.player.lives = current_lives
                 elif self.current_level.state == "next" and self.secret_level_idx < len(self.secret_level_list):
                     current_lives = self.current_level.player.lives
-                    self.secret_level_idx += 1
                     self.current_level = self.secret_level_list[self.secret_level_idx]
+                    self.secret_level_idx += 1
                     # self.current_level.player.touched_acorn = True
                     self.current_level.reset()
                     self.current_level.player.lives = current_lives
