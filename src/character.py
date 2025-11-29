@@ -6,7 +6,7 @@ import pygame
 from settings import BLOCK_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 from settings import ROLLING_IMAGE_INCREMENT, RUNNING_IMAGE_INCREMENT, IDLE_IMAGE_INCREMENT
 from settings import screen
-from objects import Object, CollectableObject, InteractableObject, DangerousObject, StaticObject, DecorationObject
+from objects import Object, CollectableObject, InteractableObject, DangerousObject, StaticObject, DecorationObject, Acorn
 from objects import Coin, Heart, EndOfLevelObject
 from sounds import SoundAssets
 
@@ -50,6 +50,8 @@ class Player(SoundAssets):
         self.get_img(self.img, 32, 32, (0, 0, 0), 6, 8, self.rolling_img_list)
         self.get_img(self.img, 32, 32, (0, 0, 0), 1, 4, self.idle_image_list)
         self.get_img(self.img, 32, 32, (0, 0, 0), 8, 4, self.death_img_list)
+        # acorn (secret)
+        self.touched_acorn = False
 
     def reset(self):
         """
@@ -154,9 +156,12 @@ class Player(SoundAssets):
                         if keys[pygame.K_RETURN]:
                             if obj.object_is_usable and obj.number_of_interactions > 0: # if it's not being used, you can TRY to use it
                                 obj.object_is_usable = False
-                                obj.sound.play()
+                                if obj.sound is not None:
+                                    obj.sound.play()
                                 if isinstance(obj, EndOfLevelObject): # check if the object is the end level flag
                                     self.completed_current_level = True
+                                elif isinstance(obj, Acorn):
+                                    self.touched_acorn = True
                                 else: # it is a chest containing a fixed amount of coins
                                     self.coins_collected += obj.value
                     elif isinstance(obj, DangerousObject):
@@ -189,12 +194,6 @@ class Player(SoundAssets):
                     is_corner = True
                 # going vertically
                 if img_mask.overlap(obj_mask, (obj.obj_rect.x - self.player_rect.x, obj.obj_rect.y - (self.player_rect.y + self.dy))):
-                    if is_corner:
-                        if self.can_jump: # this fixes top corners
-                            self.player_rect.bottom = obj.obj_rect.top
-                        else: # this fixes bottom corners (still a bit glitchy, but it doesn't get stuck anymore)
-                            self.player_rect.top = obj.obj_rect.bottom
-
                     if self.player_gravity > 0: # landing on the ground
                         self.dy = 0
                         self.player_gravity = 0
@@ -203,6 +202,12 @@ class Player(SoundAssets):
                     elif self.player_gravity < 0: # hitting the ceiling
                         self.dy = 0
                         self.player_gravity = 0
+
+                    if is_corner:
+                        if self.can_jump: # this fixes top corners
+                            self.player_rect.bottom = obj.obj_rect.top
+                        else: # this fixes bottom corners (still a bit glitchy, but it doesn't get stuck anymore)
+                            self.player_rect.top = obj.obj_rect.bottom
 
         if self.player_is_alive:
             # checking if player is idle

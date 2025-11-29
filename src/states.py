@@ -7,7 +7,7 @@ import pygame
 import storage
 from buttons import Button
 from levels import Level
-from worlds import create_world, world_level_01, world_level_02
+from worlds import create_world, world_level_01, world_level_02, secret_world
 from settings import screen, instructions, features, story, play_hint, story_hint, help_hint, feats_hint, reset_hint
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, BLOCK_SIZE
 from sounds import SoundAssets
@@ -328,11 +328,18 @@ class Gameplay(State):
         # Initialise the sequence of worlds, backgrounds and indices once
         self.world_sequence = [
             ("../assets/backgrounds/sky.jpg", world_level_01, 1, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_02, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
+            ("../assets/backgrounds/sky.jpg", world_level_02, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+        ]
+        self.secret_world_sequence = [
+            # The last level is only accesible by interacting with the All Powerful Acorn
+            ("../assets/backgrounds/sky.jpg", secret_world, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
         ]
         self.level_list = []
+        self.secret_level_list = []
         self.level_idx = 0
+        self.secret_level_idx = 0
         self.current_level = None
+        self.start_secret = False
 
     def startup(self):
         """
@@ -341,6 +348,9 @@ class Gameplay(State):
         # Initialise all levels in advance
         self.level_list = [Level(bg, world, idx, start_x, start_y)
                             for bg, world, idx, start_x, start_y in self.world_sequence]
+        # Initialise all (secret) levels in advance
+        self.secret_level_list = [Level(bg, world, idx, start_x, start_y)
+                            for bg, world, idx, start_x, start_y in self.secret_world_sequence]
         # Determine which level will be run
         self.game.last_played_level = storage.load_save() # sync save file
         if self.game.last_played_level >= len(self.level_list):
@@ -359,9 +369,38 @@ class Gameplay(State):
         """
         if self.current_level.running:
             self.current_level.run_level()
+            if self.current_level.player.touched_acorn == True:
+                self.start_secret = True
         else:
+            if self.start_secret:
+                if self.secret_level_idx == 0 and self.secret_level_list:
+                    current_lives = self.current_level.player.lives
+                    self.current_level = self.secret_level_list[self.secret_level_idx]
+                    self.secret_level_idx += 1
+                    # self.current_level.player.touched_acorn = True
+                    self.current_level.reset()
+                    self.current_level.player.lives = current_lives
+                elif self.current_level.state == "next" and self.secret_level_idx < len(self.secret_level_list):
+                    current_lives = self.current_level.player.lives
+                    self.secret_level_idx += 1
+                    self.current_level = self.secret_level_list[self.secret_level_idx]
+                    # self.current_level.player.touched_acorn = True
+                    self.current_level.reset()
+                    self.current_level.player.lives = current_lives
+                else:
+                    # after all the secret levels are over, the player is sent back to the normal level he came from
+                    self.current_level.reset()
+                    self.current_level = self.level_list[self.level_idx]
+                    self.current_level.player.touched_acorn = False
+                    self.current_level.running = True
+                    
+                    self.current_level.state = "playing"
+                    
+                    # self.level_idx -= 1
+                    # print(self.level_idx)
+                    self.start_secret = False
             # The current level ended (Win or Lose)
-            if self.current_level.state == "next" and self.level_idx + 1 < len(self.level_list):
+            elif self.current_level.state == "next" and self.level_idx + 1 < len(self.level_list):
                 # Move to the next level
                 current_lives = self.current_level.player.lives
                 self.level_idx += 1

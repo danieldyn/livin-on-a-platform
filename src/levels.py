@@ -233,6 +233,11 @@ class Level(SoundAssets):
                 self.display_time() # layer 6
                 self.display_lives() # layer 7
 
+        if self.player.touched_acorn == True:
+            # self.display_forbidden_path()
+            self.running = False
+            pass
+
         if self.player.completed_current_level and self.state != "completed":
             self.display_victory()
 

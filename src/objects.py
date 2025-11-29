@@ -170,6 +170,13 @@ class Chest(InteractableObject):
         super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
         self.sound = SoundAssets.chest
 
+class Acorn(InteractableObject):
+    def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
+        super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
+        self.sound = None
+        
+
+
 class Slime(DangerousObject):
     """
     A class that implements a slime enemy.

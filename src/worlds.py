@@ -2,7 +2,7 @@
 A module that handles the worlds in the game.
 """
 from settings import BLOCK_SIZE, screen
-from objects import Coin, Chest, DecorationObject, EndOfLevelObject, Slime, Spike, StaticObject, Heart
+from objects import Coin, Chest, DecorationObject, EndOfLevelObject, Slime, Spike, StaticObject, Heart, Acorn
 
 class World():
     """
@@ -55,7 +55,7 @@ class World():
                     # water block
                     block_x = BLOCK_SIZE * col_count
                     block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/Water/water.png', block_x, block_y)
+                    block = DecorationObject('../assets/Water/water.png', block_x, block_y)
                     block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
                     self.obj_list.append(block)
                 if block == '4':
@@ -78,7 +78,7 @@ class World():
                     # tier 1 chest (least nice)
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
-                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2, 2)
+                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2)
                     chest.get_object_image(48, 32, 1, (0, 0, 0), 1, 5, chest.object_img_list)
                     chest.get_object_image(48, 32, 1, (0, 0, 0), 2, 5, chest.object_img_list)
                     self.obj_list.append(chest)
@@ -86,7 +86,7 @@ class World():
                     # tier 2 chest
                     chest_x = BLOCK_SIZE * col_count
                     chest_y = BLOCK_SIZE * row_count
-                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2, 10)
+                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2)
                     chest.get_object_image(48, 32, 1,(0, 0, 0), 3, 5, chest.object_img_list)
                     chest.get_object_image(48, 32, 1, (0, 0, 0), 4, 5, chest.object_img_list)
                     self.obj_list.append(chest)
@@ -150,6 +150,12 @@ class World():
                     flower = DecorationObject('../assets/Props/flower.png', flower_x, flower_y)
                     flower.get_object_image(32, 32, 1, (0, 0, 0), 1, 1, flower.object_img_list)
                     self.obj_list.append(flower)
+                if block == 's':
+                    acorn_x = BLOCK_SIZE * col_count
+                    acorn_y = BLOCK_SIZE * row_count
+                    acorn = Acorn('../assets/acorns/acorn_iocla.png', acorn_x, acorn_y, 10)
+                    acorn.get_object_image(312, 293, 0.6, (255, 255, 255), 1, 1, acorn.object_img_list)
+                    self.obj_list.append(acorn)
                 col_count += 1
             row_count += 1
 
@@ -191,3 +197,4 @@ def reset_world(path_to_world_data):
 # level worlds
 world_level_01 = create_world("../assets/worlds/world1.txt")
 world_level_02 = create_world("../assets/worlds/world2.txt")
+secret_world = create_world("../assets/worlds/secret.txt")
