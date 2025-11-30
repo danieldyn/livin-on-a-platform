@@ -148,8 +148,22 @@ class World():
                     flower_x = BLOCK_SIZE * col_count
                     flower_y = BLOCK_SIZE * row_count
                     flower = DecorationObject('../assets/Props/flower.png', flower_x, flower_y)
-                    flower.get_object_image(32, 32, 1, (0, 0, 0), 1, 1, flower.object_img_list)
+                    flower.get_object_image(32, 32, 1.2, (0, 0, 0), 1, 1, flower.object_img_list)
                     self.obj_list.append(flower)
+                if block == 'g':
+                    # underground tile 1
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../assets/tiles/underground1.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
+                if block == 'h':
+                    # underground tile 2
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../assets/tiles/underground2.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
                 if block == 's':
                     acorn_x = BLOCK_SIZE * col_count
                     acorn_y = BLOCK_SIZE * row_count
@@ -193,9 +207,3 @@ def reset_world(path_to_world_data):
     world.get_world_data() # get data
     world.get_block_list(world.world_data) # get blocks (and objects)
     return world
-
-# level worlds
-world_level_01 = create_world("../assets/worlds/world1.txt")
-world_level_02 = create_world("../assets/worlds/world2.txt")
-secret_world = create_world("../assets/worlds/secret.txt")
-secret_world1 = create_world("../assets/worlds/secret1.txt")
