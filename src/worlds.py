@@ -164,6 +164,27 @@ class World():
                     block = StaticObject('../assets/tiles/underground2.png', block_x, block_y)
                     block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
                     self.obj_list.append(block)
+                if block == 'i':
+                    # stone block
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../assets/tiles/stone.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
+                if block == 'j':
+                    # cobblestone tile 2
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../assets/tiles/cobblestone1.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
+                if block == 'k':
+                    # cobblestone tile 2
+                    block_x = BLOCK_SIZE * col_count
+                    block_y = BLOCK_SIZE * row_count
+                    block = StaticObject('../assets/tiles/cobblestone2.png', block_x, block_y)
+                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                    self.obj_list.append(block)
                 if block == 's':
                     acorn_x = BLOCK_SIZE * col_count
                     acorn_y = BLOCK_SIZE * row_count

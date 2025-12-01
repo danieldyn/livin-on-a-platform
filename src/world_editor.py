@@ -32,7 +32,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 FPS = 60
 
-list_block_char = ['0', '1', 'g', 'h', '2', '3', '4', '5', 'd', 'e', 'f', 'b', 'c', '6', '7', '8', '9', 'a', 's']
+list_block_char = ['0', '1', 'g', 'h', 'i', 'j', 'k', '2', '3', '4', '5', 'd', 'e', 'f', 'b', 'c', '6', '7', '8', '9', 'a', 's']
 
 class WorldEditor():
         def __init__(self, grid):
@@ -172,6 +172,27 @@ class WorldEditor():
                             block_x = BLOCK_SIZE * col_count
                             block_y = BLOCK_SIZE * row_count
                             block = StaticObject('../assets/tiles/underground2.png', block_x, block_y)
+                            block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                            self.obj_list.append(block)
+                        if block == 'i':
+                            # stone block
+                            block_x = BLOCK_SIZE * col_count
+                            block_y = BLOCK_SIZE * row_count
+                            block = StaticObject('../assets/tiles/stone.png', block_x, block_y)
+                            block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                            self.obj_list.append(block)
+                        if block == 'j':
+                            # cobblestone tile 2
+                            block_x = BLOCK_SIZE * col_count
+                            block_y = BLOCK_SIZE * row_count
+                            block = StaticObject('../assets/tiles/cobblestone1.png', block_x, block_y)
+                            block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
+                            self.obj_list.append(block)
+                        if block == 'k':
+                            # cobblestone tile 2
+                            block_x = BLOCK_SIZE * col_count
+                            block_y = BLOCK_SIZE * row_count
+                            block = StaticObject('../assets/tiles/cobblestone2.png', block_x, block_y)
                             block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
                             self.obj_list.append(block)
                         if block == 's':
