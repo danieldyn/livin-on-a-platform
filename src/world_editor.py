@@ -1,3 +1,12 @@
+"""
+Usage:
+    With the cursor, hover over a block
+Then press:
+    -> 'e' to the next block in the list
+    -> 'w' to delete to current block (and start over in the list)
+    -> 'q' to go to the previous block in the list
+"""
+
 import sys
 import os.path
 
@@ -23,7 +32,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 FPS = 60
 
-list_block_char = ['0', '1', '2', 'g', 'h', '3', '4', '5', 'd', 'e', 'f', 'b', 'c', '6', '7', '8', '9', 'a', 's']
+list_block_char = ['0', '1', 'g', 'h', '2', '3', '4', '5', 'd', 'e', 'f', 'b', 'c', '6', '7', '8', '9', 'a', 's']
 
 class WorldEditor():
         def __init__(self, grid):
@@ -220,21 +229,28 @@ while run:
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                         run = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if pygame.mouse.get_pressed()[0]: # right click
+                elif event.type == pygame.KEYDOWN:
+                    keys = pygame.key.get_pressed()
+                    if keys[pygame.K_e]: # press e
                         (mouseX, mouseY) = pygame.mouse.get_pos()
                         mouseX //= BLOCK_SIZE
                         mouseY //= BLOCK_SIZE
                         world_data_index[mouseY][mouseX] += 1
                         world_data_index[mouseY][mouseX] %= len(list_block_char)
                         world1_data[mouseY][mouseX] = list_block_char[world_data_index[mouseY][mouseX]]
-                    if pygame.mouse.get_pressed()[2]: # left click
+                    if keys[pygame.K_q]: # press w
                         (mouseX, mouseY) = pygame.mouse.get_pos()
                         mouseX //= BLOCK_SIZE
                         mouseY //= BLOCK_SIZE
                         world_data_index[mouseY][mouseX] -= 1
                         if world_data_index[mouseY][mouseX] < 0:
                              world_data_index[mouseY][mouseX] = len(list_block_char) - 1
+                        world1_data[mouseY][mouseX] = list_block_char[world_data_index[mouseY][mouseX]]
+                    if keys[pygame.K_w]: # press q
+                        (mouseX, mouseY) = pygame.mouse.get_pos()
+                        mouseX //= BLOCK_SIZE
+                        mouseY //= BLOCK_SIZE
+                        world_data_index[mouseY][mouseX] = 0
                         world1_data[mouseY][mouseX] = list_block_char[world_data_index[mouseY][mouseX]]
 
         world1.draw()

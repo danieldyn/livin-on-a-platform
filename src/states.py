@@ -326,7 +326,7 @@ class Gameplay(State):
     def __init__(self, game):
         super().__init__(game)
         # Create worlds once
-        world_level_01 = create_world("../assets/worlds/world1.txt")
+        world_level_01 = create_world("../assets/worlds/world9.txt")
         world_level_02 = create_world("../assets/worlds/world2.txt")
         world_level_03 = create_world("../assets/worlds/world3.txt")
         world_level_04 = create_world("../assets/worlds/world4.txt")
