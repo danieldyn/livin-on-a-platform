@@ -199,7 +199,10 @@ class Level(SoundAssets):
             return
 
         img_frame = self.player.death_img_list[int(self.player.death_img_index)][0] # the surface
-        screen.blit(img_frame, self.player.player_rect)
+        # compute actual draw coordinated by subtracting the offsets
+        draw_pos_x = self.player.player_rect.x - self.player.draw_offset_x
+        draw_pos_y = self.player.player_rect.y - self.player.draw_offset_y
+        screen.blit(img_frame, (draw_pos_x, draw_pos_y))
 
     def display_victory(self):
         """
