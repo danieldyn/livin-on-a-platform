@@ -42,6 +42,7 @@ class Level(SoundAssets):
         self.start_x = start_x
         self.start_y = start_y
         self.player = Player(start_x, start_y)
+        self.player2 = Player(start_x + 32, start_y + 32)
 
     def reset(self):
         """
@@ -69,11 +70,13 @@ class Level(SoundAssets):
         screen.blit(self.bg_surf, (0, 0))
         # self.world.draw()
 
-    def display_player(self):
+    def display_player(self, player_can_move = True, single_player = True):
         """
         A wrapper method that simply updates the player.
         """
-        self.player.update(self.world)
+        self.player.update(self.world, player_can_move)
+        if not single_player:
+            self.player2.update(self.world, player_can_move)
 
     def display_objects(self):
         """

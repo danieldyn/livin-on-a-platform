@@ -72,7 +72,7 @@ class MainMenu(State):
 
         # Store main menu world inside a Level object
         world_main_menu = create_world("../assets/worlds/main_menu.txt")
-        self.level_instance = Level('../assets/backgrounds/sky.jpg', world_main_menu, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.level_instance = Level('../assets/backgrounds/sky.jpg', world_main_menu, 0, 900, SCREEN_HEIGHT / 2)
 
 
     def startup(self):
@@ -93,6 +93,7 @@ class MainMenu(State):
         """
         self.level_instance.display_world()
         self.level_instance.display_objects()
+        self.level_instance.display_player(False, False)
 
         # Display hints using hardcoded values to fit well in the chosen background
         y = 500

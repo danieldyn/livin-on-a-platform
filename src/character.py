@@ -64,7 +64,7 @@ class Player(SoundAssets):
         self.get_img(self.img, 32, 32, (0, 0, 0), 1, 4, self.idle_image_list)
         self.get_img(self.img, 32, 32, (0, 0, 0), 8, 4, self.death_img_list)
 
-    def update(self, level_world):
+    def update(self, level_world, can_move = True):
         """
         A method that updates player physics and rendering.
         """
@@ -77,7 +77,8 @@ class Player(SoundAssets):
 
         # movement input capturing
         keys = pygame.key.get_pressed()
-        self.get_movement_input(keys) 
+        if can_move:    
+            self.get_movement_input(keys) 
 
         # animation index updates
         if int(self.running_img_index) >= len(self.running_img_list):
