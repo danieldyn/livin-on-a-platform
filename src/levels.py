@@ -54,7 +54,7 @@ class Level(SoundAssets):
         self.player.player_is_alive = True
         self.player.reset()
         mixer.music.rewind()
-        mixer.music.play()
+        mixer.music.play(loops=-1)
         restart_button.reset()
         main_menu_button.reset()
         self.world = reset_world(self.world.file_path)
