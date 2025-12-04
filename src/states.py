@@ -327,23 +327,33 @@ class Gameplay(State):
     def __init__(self, game):
         super().__init__(game)
         # Create worlds once
-        world_level_01 = create_world("../assets/worlds/world10.txt")
+        world_level_01 = create_world("../assets/worlds/world1.txt")
         world_level_02 = create_world("../assets/worlds/world2.txt")
         world_level_03 = create_world("../assets/worlds/world3.txt")
         world_level_04 = create_world("../assets/worlds/world4.txt")
-        world_level_05 = create_world("../assets/worlds/world9.txt")
-        world_level_06 = create_world("../assets/worlds/world5.txt")
+        world_level_05 = create_world("../assets/worlds/world5.txt")
+        world_level_06 = create_world("../assets/worlds/world6.txt") # contains secret level entry point
+        world_level_07 = create_world("../assets/worlds/world7.txt")
+        #world_level_08 = create_world("../assets/worlds/world8.txt")
+        world_level_09 = create_world("../assets/worlds/world9.txt")
+        world_level_10 = create_world("../assets/worlds/world10.txt")
+        world_level_11 = create_world("../assets/worlds/world11.txt")
         secret_world = create_world("../assets/worlds/secret.txt")
         secret_world1 = create_world("../assets/worlds/secret1.txt")
 
         # Initialise the sequence of worlds, backgrounds and indices once
         self.world_sequence = [
-            ("../assets/backgrounds/sky.jpg", world_level_01, 1, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_02, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_03, 3, 5 * BLOCK_SIZE, SCREEN_HEIGHT / 4),
-            ("../assets/backgrounds/sky.jpg", world_level_04, 4, 5 * BLOCK_SIZE, SCREEN_HEIGHT - 2 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_05, 5, 6 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_06, 4, 5 * BLOCK_SIZE, SCREEN_HEIGHT - 2 * BLOCK_SIZE)
+            ("../assets/backgrounds/sky.jpg", world_level_01, 1, 10 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_02, 2, 9 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_03, 3, 5 * BLOCK_SIZE, 19 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_04, 4, 5 * BLOCK_SIZE, SCREEN_HEIGHT - 3 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_05, 5, 5 * BLOCK_SIZE, SCREEN_HEIGHT - 11 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_06, 6, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 8 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_07, 7, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
+            #("../assets/backgrounds/sky.jpg", world_level_08, 8, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_09, 8, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_10, 9, 23 * BLOCK_SIZE, SCREEN_HEIGHT - 5 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_11, 10, 3 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE)
         ]
         self.secret_world_sequence = [
             # The last level is only accesible by interacting with the All Powerful Acorn

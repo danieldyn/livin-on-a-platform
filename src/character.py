@@ -69,15 +69,15 @@ class Player(SoundAssets):
         A method that updates player physics and rendering.
         """
         # apply gravity
-        self.dx = 0
-
         self.velocity_y += self.gravity_strength
         self.velocity_y = min(self.velocity_y, self.max_fall_speed)
+
+        self.dx = 0
         self.dy = int(self.velocity_y)
 
         # movement input capturing
         keys = pygame.key.get_pressed()
-        if can_move:    
+        if can_move:
             self.get_movement_input(keys) 
 
         # animation index updates
@@ -86,32 +86,48 @@ class Player(SoundAssets):
 
         if int(self.rolling_img_index) >= len(self.rolling_img_list):
             self.rolling_img_index = 0
-        
+
         # horizontal collisions and movement
         self.player_rect.x += self.dx
-        for obj in level_world.obj_list:
-            if isinstance(obj, StaticObject) and not isinstance(obj, DecorationObject):
-                if self.player_rect.colliderect(obj.obj_rect):
-                    if self.dx > 0: # going right
-                        self.player_rect.right = obj.obj_rect.left
-                    elif self.dx < 0: # going left
-                        self.player_rect.left = obj.obj_rect.right
-                    self.dx = 0
+        start_col = self.player_rect.left // BLOCK_SIZE
+        end_col = (self.player_rect.right - 1) // BLOCK_SIZE
+        start_row = self.player_rect.top // BLOCK_SIZE
+        end_row = (self.player_rect.bottom - 1) // BLOCK_SIZE
+
+        for col in range(start_col, end_col + 1):
+            for row in range(start_row, end_row + 1):
+                # look inside the map (constant time operation)
+                if (col, row) in level_world.tile_map:
+                    block = level_world.tile_map[(col, row)]
+                    if self.player_rect.colliderect(block.obj_rect):
+                        if self.dx > 0: # going right
+                            self.player_rect.right = block.obj_rect.left
+                        elif self.dx < 0: # going left
+                            self.player_rect.left = block.obj_rect.right
+                        self.dx = 0
 
         # vertical collisions and movement
         self.player_rect.y += self.dy
-        for obj in level_world.obj_list:
-            if isinstance(obj, StaticObject) and not isinstance(obj, DecorationObject):
-                if self.player_rect.colliderect(obj.obj_rect):
-                    if self.dy > 0: # landing on the ground
-                        self.player_rect.bottom = obj.obj_rect.top
-                        self.velocity_y = 0
-                        self.dy = 0
-                        self.can_jump = True
-                    elif self.dy < 0: # hitting the ceiling
-                        self.player_rect.top = obj.obj_rect.bottom
-                        self.velocity_y = 0 
-                        self.dy = 0
+        start_col = self.player_rect.left // BLOCK_SIZE
+        end_col = (self.player_rect.right - 1) // BLOCK_SIZE
+        start_row = self.player_rect.top // BLOCK_SIZE
+        end_row = (self.player_rect.bottom - 1) // BLOCK_SIZE
+
+        for col in range(start_col, end_col + 1):
+            for row in range(start_row, end_row + 1):
+                # look inside the map (constant time operation)
+                if (col, row) in level_world.tile_map:
+                    block = level_world.tile_map[(col, row)]
+                    if self.player_rect.colliderect(block.obj_rect):
+                        if self.dy > 0: # landing on the ground
+                            self.player_rect.bottom = block.obj_rect.top
+                            self.velocity_y = 0
+                            self.dy = 0
+                            self.can_jump = True
+                        elif self.dy < 0: # hitting the ceiling
+                            self.player_rect.top = block.obj_rect.bottom
+                            self.velocity_y = 0
+                            self.dy = 0
 
         # hitbox debugging, keep commented
         #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
@@ -205,8 +221,8 @@ class Player(SoundAssets):
         img_mask = self.running_img_list[int(self.running_img_index)][2] # the mask of the player
         # check player interaction with objects
         for obj in level_world.obj_list:
-            # blocks already covered
-            if isinstance(obj, StaticObject): 
+            # ignore decorations
+            if isinstance(obj, DecorationObject): 
                 continue
             # mask collision for items and obstacles
             for img in obj.object_img_list:

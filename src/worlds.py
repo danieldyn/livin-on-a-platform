@@ -7,10 +7,11 @@ from objects import Coin, Chest, DecorationObject, EndOfLevelObject, Slime, Spik
 class World():
     """
     A class that implements an in-game world.
-    Every world has a grid of blocks, objects, obstacles (dangerous objects) and enemies.
+    Every world has a map of static objects and a list of dynamic ones.
     """
     def __init__(self, file_path):
         self.block_list = []
+        self.tile_map = {} # map for fast queries on static blocks
         self.obj_list = []
         self.world_data = []
         self.file_path = file_path
@@ -25,180 +26,133 @@ class World():
 
     def get_block_list(self, grid):
         """
-        A method that populates a world's block list according to the grid.
+        A method that populates a world's block map according to the grid (a matrix of characters).
         """
 
         row_count = 0
         for row in grid:
             col_count = 0
             for block in row:
-                if block == '-':
-                    # ignore block
-                    # some objects are inserted into the text file as 1 block, but they occupy more space
-                    # adding an ignore block lets us signal that some adjacent blocks are occupied
-                    pass
-                if block == '1':
-                    # dirt block
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/GrassBlockBuildable/grassblocksetBuildable4.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == '2':
-                    # grass block
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/GrassBlockBuildable/grassblocksetBuildable1.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == '3':
-                    # water block
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = DecorationObject('../assets/Water/water.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == '4':
-                    # coin
-                    coin_x = BLOCK_SIZE * col_count
-                    coin_y = BLOCK_SIZE * row_count
-                    # (filepath, x, y, value) -> coin = Coin() -> super()
-                    coin = Coin('../assets/sprites/coin.png', coin_x, coin_y, 1)
-                    coin.get_object_image(16, 16, 1, (0, 0, 0), 1, 12, coin.object_img_list)
-                    self.obj_list.append(coin)
-                if block == '5':
-                    # spike block
-                    spike_x = BLOCK_SIZE * col_count
-                    skipe_y = BLOCK_SIZE * row_count
-                    spike = Spike('../assets/Props/spikes.png', spike_x, skipe_y)
-                    spike.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, spike.object_img_list)
-                    self.obj_list.append(spike)
-                # chests will be increasingly more valuable as the number is higer
-                if block == '6':
-                    # tier 1 chest (least nice)
-                    chest_x = BLOCK_SIZE * col_count
-                    chest_y = BLOCK_SIZE * row_count
-                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2)
-                    chest.get_object_image(48, 32, 1, (0, 0, 0), 1, 5, chest.object_img_list)
-                    chest.get_object_image(48, 32, 1, (0, 0, 0), 2, 5, chest.object_img_list)
-                    self.obj_list.append(chest)
-                if block == '7':
-                    # tier 2 chest
-                    chest_x = BLOCK_SIZE * col_count
-                    chest_y = BLOCK_SIZE * row_count
-                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2)
-                    chest.get_object_image(48, 32, 1,(0, 0, 0), 3, 5, chest.object_img_list)
-                    chest.get_object_image(48, 32, 1, (0, 0, 0), 4, 5, chest.object_img_list)
-                    self.obj_list.append(chest)
-                if block == '8':
-                    # tier 3 chest
-                    chest_x = BLOCK_SIZE * col_count
-                    chest_y = BLOCK_SIZE * row_count
-                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2)
-                    chest.get_object_image(48, 32, 1,(0, 0, 0), 5, 5, chest.object_img_list)
-                    chest.get_object_image(48, 32, 1, (0, 0, 0), 6, 5, chest.object_img_list)
-                    self.obj_list.append(chest)
-                if block == '9':
-                    # tier 4 chest (nicest)
-                    chest_x = BLOCK_SIZE * col_count
-                    chest_y = BLOCK_SIZE * row_count
-                    chest = Chest('../assets/sprites/chests.png', chest_x, chest_y, 2)
-                    chest.get_object_image(48, 32, 1,(0, 0, 0), 7, 5, chest.object_img_list)
-                    chest.get_object_image(48, 32, 1, (0, 0, 0), 8, 5, chest.object_img_list)
-                    self.obj_list.append(chest)
-                if block == 'a':
-                    # tree
-                    tree_x = BLOCK_SIZE * col_count
-                    tree_y = BLOCK_SIZE * row_count
-                    tree = DecorationObject('../assets/Tree/tree.png', tree_x, tree_y)
-                    tree.get_object_image(48, 80, 1.2, (0, 0, 0), 1, 1, tree.object_img_list)
-                    self.obj_list.append(tree)
-                if block == 'b':
-                    # end of level flag
-                    flag_x = BLOCK_SIZE * col_count
-                    flag_y = BLOCK_SIZE * row_count
-                    flag = EndOfLevelObject('../assets/Checkpoint/checkpoint.png', flag_x, flag_y, 0)
-                    flag.get_object_image(48, 32, 1, (0, 0, 0), 1, 1, flag.object_img_list)
-                    self.obj_list.append(flag)
-                if block == 'c':
-                    # enemy (slime)
-                    slime_x = BLOCK_SIZE * col_count
-                    slime_y = BLOCK_SIZE * row_count
-                    slime = Slime('../assets/sprites/slime_purple.png', slime_x, slime_y, 20)
-                    # 20 is a test value (hardcoded for now - will change later)
-                    slime.get_object_image(24, 24, 1.35, (0, 0, 0), 2, 4, slime.object_img_list)
-                    # 1.35 hardcoded value (gives the impression that the slime is touching the ground)
-                    self.obj_list.append(slime)
-                if block == 'd':
-                    # heart
-                    heart_x = BLOCK_SIZE * col_count
-                    heart_y = BLOCK_SIZE * row_count
-                    heart = Heart('../assets/Heart/heartanim1.png', heart_x, heart_y, 0)
-                    heart.get_object_image(16, 16, 1.2, (0, 0, 0), 1, 1, heart.object_img_list)
-                    self.obj_list.append(heart)
-                if block == 'e':
-                    # mushroom
-                    shroom_x = BLOCK_SIZE * col_count
-                    shroom_y = BLOCK_SIZE * row_count
-                    shroom = DecorationObject('../assets/Props/shroom.png', shroom_x, shroom_y)
-                    shroom.get_object_image(32, 32, 1, (0, 0, 0), 1, 1, shroom.object_img_list)
-                    self.obj_list.append(shroom)
-                if block == 'f':
-                    # flower
-                    flower_x = BLOCK_SIZE * col_count
-                    flower_y = BLOCK_SIZE * row_count
-                    flower = DecorationObject('../assets/Props/flower.png', flower_x, flower_y)
-                    flower.get_object_image(32, 32, 1.2, (0, 0, 0), 1, 1, flower.object_img_list)
-                    self.obj_list.append(flower)
-                if block == 'g':
-                    # underground tile 1
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/tiles/underground1.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == 'h':
-                    # underground tile 2
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/tiles/underground2.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == 'i':
-                    # stone block
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/tiles/stone.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == 'j':
-                    # cobblestone tile 2
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/tiles/cobblestone1.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == 'k':
-                    # cobblestone tile 2
-                    block_x = BLOCK_SIZE * col_count
-                    block_y = BLOCK_SIZE * row_count
-                    block = StaticObject('../assets/tiles/cobblestone2.png', block_x, block_y)
-                    block.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, block.object_img_list)
-                    self.obj_list.append(block)
-                if block == 's':
-                    acorn_x = BLOCK_SIZE * col_count
-                    acorn_y = BLOCK_SIZE * row_count
-                    acorn = Acorn('../assets/acorns/acorn_iocla.png', acorn_x, acorn_y, 10)
-                    acorn.get_object_image(312, 293, 0.6, (255, 255, 255), 1, 1, acorn.object_img_list)
-                    self.obj_list.append(acorn)
+                # current coordinates
+                x = BLOCK_SIZE * col_count
+                y = BLOCK_SIZE * row_count
+
+                # static objects go in the map
+                if block in ['1', '2', 'g', 'h', 'i', 'j', 'k']:
+                    img_path = ''
+                    if block == '1':
+                        img_path = '../assets/GrassBlockBuildable/grassblocksetBuildable4.png'
+
+                    elif block == '2':
+                        img_path = '../assets/GrassBlockBuildable/grassblocksetBuildable1.png'
+
+                    elif block == 'g':
+                        img_path = '../assets/tiles/underground1.png'
+
+                    elif block == 'h':
+                        img_path = '../assets/tiles/underground2.png'
+
+                    elif block == 'i':
+                        img_path = '../assets/tiles/stone.png'
+
+                    elif block == 'j':
+                        img_path = '../assets/tiles/cobblestone1.png'
+
+                    elif block == 'k':
+                        img_path = '../assets/tiles/cobblestone2.png'
+
+                    # all static objects are instantiated the same
+                    static_obj = StaticObject(img_path, x, y)
+                    static_obj.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, static_obj.object_img_list)
+                    self.tile_map[(col_count, row_count)] = static_obj
+                # everything else belongs in the list
+                else:
+                    new_obj = None
+
+                    if block == '-':
+                        # ignore block
+                        # some objects are inserted into the text file as 1 block, but they occupy more space
+                        # adding an ignore block lets us signal that some adjacent blocks are occupied
+                        pass
+
+                    if block == '3': # water
+                        new_obj = DecorationObject('../assets/Water/water.png', x, y)
+                        new_obj.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, new_obj.object_img_list)
+                    
+                    elif block == '4': # coin
+                        # (filepath, x, y, value) -> coin = Coin() -> super()
+                        new_obj = Coin('../assets/sprites/coin.png', x, y, 1)
+                        new_obj.get_object_image(16, 16, 1, (0, 0, 0), 1, 12, new_obj.object_img_list)
+
+                    elif block == '5': # spike
+                        new_obj = Spike('../assets/Props/spikes.png', x, y)
+                        new_obj.get_object_image(16, 16, 1, (0, 0, 0), 1, 1, new_obj.object_img_list)
+                    
+                    elif block == '6': # tier 1 chest, will be increasingly more valuable as the number is higher
+                        new_obj = Chest('../assets/sprites/chests.png', x, y, 2)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 1, 5, new_obj.object_img_list)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 2, 5, new_obj.object_img_list)
+
+                    elif block == '7': # tier 2 chest
+                        new_obj = Chest('../assets/sprites/chests.png', x, y, 4)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 3, 5, new_obj.object_img_list)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 4, 5, new_obj.object_img_list)
+
+                    elif block == '8': # tier 3 chest
+                        new_obj = Chest('../assets/sprites/chests.png', x, y, 6)
+                        new_obj.get_object_image(48, 32, 1,(0, 0, 0), 5, 5, new_obj.object_img_list)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 6, 5, new_obj.object_img_list)
+                    
+                    elif block == '9': # tier 4 chest
+                        new_obj = Chest('../assets/sprites/chests.png', x, y, 10)
+                        new_obj.get_object_image(48, 32, 1,(0, 0, 0), 7, 5, new_obj.object_img_list)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 8, 5, new_obj.object_img_list)
+                    
+                    elif block == 'a': # tree
+                        new_obj = DecorationObject('../assets/Tree/tree.png', x, y)
+                        new_obj.get_object_image(48, 80, 1.2, (0, 0, 0), 1, 1, new_obj.object_img_list)
+                    
+                    elif block == 'b': # end of level flag
+                        new_obj = EndOfLevelObject('../assets/Checkpoint/checkpoint.png', x, y, 0)
+                        new_obj.get_object_image(48, 32, 1, (0, 0, 0), 1, 1, new_obj.object_img_list)
+
+                    elif block == 'c': # slime
+                        new_obj = Slime('../assets/sprites/slime_purple.png', x, y, 20)
+                        # 20 is a test value (hardcoded for now - will change later)
+                        new_obj.get_object_image(24, 24, 1.35, (0, 0, 0), 2, 4, new_obj.object_img_list)
+                        # 1.35 hardcoded value (gives the impression that the slime is touching the ground)
+
+                    elif block == 'd': # heart
+                        new_obj = Heart('../assets/Heart/heartanim1.png', x, y, 0)
+                        new_obj.get_object_image(16, 16, 1.2, (0, 0, 0), 1, 1, new_obj.object_img_list)
+
+                    elif block == 'e': # mushroom
+                        new_obj = DecorationObject('../assets/Props/shroom.png', x, y)
+                        new_obj.get_object_image(32, 32, 1, (0, 0, 0), 1, 1, new_obj.object_img_list)
+                    
+                    elif block == 'f': # flower
+                        new_obj = DecorationObject('../assets/Props/flower.png', x, y)
+                        new_obj.get_object_image(32, 32, 1.2, (0, 0, 0), 1, 1, new_obj.object_img_list)
+
+                    elif block == 's': # acorn
+                        new_obj = Acorn('../assets/acorns/acorn_iocla.png', x, y, 10)
+                        new_obj.get_object_image(312, 293, 0.6, (255, 255, 255), 1, 1, new_obj.object_img_list)
+
+                    # add to list if we created one
+                    if new_obj:
+                        self.obj_list.append(new_obj)
+
                 col_count += 1
             row_count += 1
 
+        # create a list for drawing purposes only
+        self.draw_list = list(self.tile_map.values()) + self.obj_list
+
     def draw(self):
         """
-        A method that draws a world..
+        A method that draws a world.
         """
-        for block in self.block_list:
+        for block in self.draw_list:
             screen.blit(block[0], block[1])
             # Keep this commented unless you want to debug the screen layout
             # pygame.draw.rect(screen, (255, 255, 255), block[1], 1)

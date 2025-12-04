@@ -60,7 +60,7 @@ class Level(SoundAssets):
         main_menu_button.reset()
         self.world = reset_world(self.world.file_path)
         next_button.reset()
-        for obj in self.world.obj_list:
+        for obj in self.world.draw_list:
             obj.object_shown = True
 
     def display_world(self):
@@ -82,7 +82,7 @@ class Level(SoundAssets):
         """
         A method that draws the level's objects.
         """
-        for obj in self.world.obj_list:
+        for obj in self.world.draw_list:
             obj : Object
             obj.object_animation()
 
