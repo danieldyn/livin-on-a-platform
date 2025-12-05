@@ -357,8 +357,8 @@ class Gameplay(State):
         ]
         self.secret_world_sequence = [
             # The last level is only accesible by interacting with the All Powerful Acorn
-            ("../assets/backgrounds/sky.jpg", secret_world, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", secret_world1, 2, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE)
+            ("../assets/backgrounds/sky.jpg", secret_world, 2, 70, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", secret_world1, 2, 6 * BLOCK_SIZE, SCREEN_HEIGHT - 11 * BLOCK_SIZE)
         ]
         self.level_list = []
         self.secret_level_list = []
