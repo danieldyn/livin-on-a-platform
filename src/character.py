@@ -26,9 +26,13 @@ class Player(SoundAssets):
         # visuals
         self.player_width = 48
         self.player_height = 48
+
+        self.rolling_height = 16
+        self.stuck_under_block = False
+
         self.visual_sink_y = 6 # helps keep the feet of the character on the ground, visually speaking
         # hitbox (what the player actually seees, influenced by transparent pixels)
-        self.hitbox_width = 18 # sprite width is approx 20 px
+        self.hitbox_width = 15 # sprite width is approx 20 px
         self.hitbox_height = 30 # sprite height is approx 30px
         # offsets to center the image on the hitbox, adjusted by vertical correction factor
         self.draw_offset_x = (self.player_width - self.hitbox_width) // 2
@@ -78,7 +82,7 @@ class Player(SoundAssets):
         # movement input capturing
         keys = pygame.key.get_pressed()
         if can_move:
-            self.get_movement_input(keys) 
+            self.get_movement_input(keys, level_world) 
 
         # animation index updates
         if int(self.running_img_index) >= len(self.running_img_list):
@@ -130,7 +134,7 @@ class Player(SoundAssets):
                             self.dy = 0
 
         # hitbox debugging, keep commented
-        #pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
+        # pygame.draw.rect(screen, (255, 255, 255), self.player_rect, 3) # for clarity
 
         # object interaction
         self.handle_interactions(level_world, keys)
@@ -152,17 +156,29 @@ class Player(SoundAssets):
             self.idle_img_index += IDLE_IMAGE_INCREMENT
             if self.idle_img_index >= len(self.idle_image_list):
                 self.idle_img_index = 0
-            img_frame = self.idle_image_list[int(self.idle_img_index)][0]
+            if self.player_is_rolling: # if the player is stuck under a block (when rolling)
+                img_frame = self.rolling_img_list[2][0]
+            else:
+                img_frame = self.idle_image_list[int(self.idle_img_index)][0]
         else:
             if self.player_is_rolling:
-                img_frame = self.rolling_img_list[int(self.rolling_img_index)][0]
+                if self.stuck_under_block == False: # normal rolling animation
+                    img_frame = self.rolling_img_list[int(self.rolling_img_index)][0]
+                else:
+                    img_frame = self.rolling_img_list[2][0] # the player is stuck
             else:
                 img_frame = self.running_img_list[int(self.running_img_index)][0]
 
             if self.dx < 0: # flip the image, making the player "turn"
                 img_frame = pygame.transform.flip(img_frame, True, False).convert_alpha()
 
-        # compute actual draw coordinated by subtracting the offsets
+
+        img_rect = img_frame.get_rect()
+        
+        img_rect.midbottom = self.player_rect.midbottom
+        
+        img_rect.y += self.visual_sink_y
+
         draw_pos_x = self.player_rect.x - self.draw_offset_x
         draw_pos_y = self.player_rect.y - self.draw_offset_y
 
@@ -170,9 +186,15 @@ class Player(SoundAssets):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_hit_time < self.hit_cooldown:
             if (current_time // 200) % 2 == 0:
-                screen.blit(img_frame, (draw_pos_x, draw_pos_y))
+                if self.player_is_rolling:
+                    screen.blit(img_frame, (draw_pos_x, draw_pos_y - 13)) # found 13 by trial and error
+                else:
+                    screen.blit(img_frame, (draw_pos_x, draw_pos_y))
         else:
-            screen.blit(img_frame, (draw_pos_x, draw_pos_y))
+            if self.player_is_rolling:
+                screen.blit(img_frame, (draw_pos_x, draw_pos_y - 13)) # found 13 by trial and error
+            else:
+                screen.blit(img_frame, (draw_pos_x, draw_pos_y))
 
         # death by falling out of the map
         if self.player_rect.y >= SCREEN_HEIGHT:
@@ -181,28 +203,77 @@ class Player(SoundAssets):
         else:
             self.player_is_alive = True
 
-    def get_movement_input(self, keys):
+    def get_movement_input(self, keys, level_world):
         """
         A method that captures user input related to movement and updates self.dx and self.dy accordingly.
         Input for object interactions is taken care by handle_interactions().
         """
+
+        wants_to_roll = keys[pygame.K_DOWN] and (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT])
+
+        if not wants_to_roll and self.player_is_rolling:
+            growth_collison = False
+            self.stuck_under_block = False
+
+            # test growth
+            growth_test_rect = self.player_rect.copy()
+            growth_test_rect.height = self.hitbox_height
+            growth_test_rect.bottom = self.player_rect.bottom - 1 # avoid checking the floor
+
+            # vertical growth collision test
+            start_col = growth_test_rect.left // BLOCK_SIZE
+            end_col = (growth_test_rect.right - 1) // BLOCK_SIZE
+            start_row = growth_test_rect.top // BLOCK_SIZE
+            end_row = (growth_test_rect.bottom - 1) // BLOCK_SIZE
+
+            for col in range(start_col, end_col + 1):
+                for row in range(start_row, end_row + 1):
+                    # look inside the map (constant time operation)
+                    if (col, row) in level_world.tile_map:
+                        block = level_world.tile_map[(col, row)]
+                        if growth_test_rect.colliderect(block.obj_rect):
+                            growth_collison = True
+                                
+
+            if growth_collison == True:
+                wants_to_roll = True
+                self.stuck_under_block = True
+
+        # shrink (for rolling)
+        if wants_to_roll and not self.player_is_rolling:
+            self.player_is_rolling = True
+            self.rolling_img_index = 0
+            
+            # the bottom of the rectangle (before shrink)
+            old_bottom = self.player_rect.bottom
+            # shrink the rectangle
+            self.player_rect.height = self.rolling_height
+            # move the shrinked rectangle to the old bottom position
+            self.player_rect.bottom = old_bottom
+
+        # return to normal position
+        elif not wants_to_roll and self.player_is_rolling:
+
+            self.player_is_rolling = False
+            self.running_img_index = 0
+            # the bottom of the rectangle (before growth) 
+            old_bottom = self.player_rect.bottom
+            # growth
+            self.player_rect.height = self.hitbox_height
+            # move the grown rectangle to the old bottom position
+            self.player_rect.bottom = old_bottom
+
         if keys[pygame.K_RIGHT]:
-            if keys[pygame.K_DOWN]:
+            if self.player_is_rolling:
                 self.rolling_img_index += ROLLING_IMAGE_INCREMENT
-                self.player_is_rolling = True
             else:
-                self.player_is_rolling = False
-                self.rolling_img_index = 0
                 self.running_img_index += RUNNING_IMAGE_INCREMENT
             self.dx += 5
 
         if keys[pygame.K_LEFT]:
-            if keys[pygame.K_DOWN]:
+            if self.player_is_rolling:
                 self.rolling_img_index += ROLLING_IMAGE_INCREMENT
-                self.player_is_rolling = True
             else:
-                self.player_is_rolling = False
-                self.rolling_img_index = 0
                 self.running_img_index += RUNNING_IMAGE_INCREMENT
             self.dx -= 5
 

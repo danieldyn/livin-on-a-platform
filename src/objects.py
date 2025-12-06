@@ -174,6 +174,24 @@ class Acorn(InteractableObject):
     def __init__(self, path_to_sheet, x, y, value, numeber_of_interactions=1):
         super().__init__(path_to_sheet, x, y, value, numeber_of_interactions)
         self.sound = None
+
+    # override
+    def object_animation(self):
+        if not self.object_is_usable and self.number_of_interactions > 0: # if object is not usable, then it is being used
+            self.object_img_index += OBJECT_IMAGE_INCREMENT
+            if self.object_img_index >= len(self.object_img_list):
+                self.object_img_index = 0
+                # after an interaction, the number of available interactions is decreased
+                self.number_of_interactions -= 1
+                self.object_is_usable = True
+            obj_surface = self.object_img_list[int(self.object_img_index)][0]
+            screen.blit(obj_surface, self.obj_rect)
+        elif self.object_is_usable:
+            if self.number_of_interactions > 0:
+                obj_surface = self.object_img_list[0][0]
+                screen.blit(obj_surface, self.obj_rect)
+            else:
+                pass
         
 
 
