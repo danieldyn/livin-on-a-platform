@@ -334,7 +334,7 @@ class Gameplay(State):
         world_level_05 = create_world("../assets/worlds/world5.txt")
         world_level_06 = create_world("../assets/worlds/world6.txt") # contains secret level entry point
         world_level_07 = create_world("../assets/worlds/world7.txt")
-        #world_level_08 = create_world("../assets/worlds/world8.txt")
+        world_level_08 = create_world("../assets/worlds/world8.txt")
         world_level_09 = create_world("../assets/worlds/world9.txt")
         world_level_10 = create_world("../assets/worlds/world10.txt")
         world_level_11 = create_world("../assets/worlds/world11.txt")
@@ -350,7 +350,7 @@ class Gameplay(State):
             ("../assets/backgrounds/sky.jpg", world_level_05, 5, 5 * BLOCK_SIZE, SCREEN_HEIGHT - 11 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_06, 6, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 8 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_07, 7, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
-            #("../assets/backgrounds/sky.jpg", world_level_08, 8, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_08, 8, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_09, 8, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_10, 9, 23 * BLOCK_SIZE, SCREEN_HEIGHT - 5 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_11, 10, 3 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE)

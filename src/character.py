@@ -268,7 +268,7 @@ class Player(SoundAssets):
                 self.rolling_img_index += ROLLING_IMAGE_INCREMENT
             else:
                 self.running_img_index += RUNNING_IMAGE_INCREMENT
-            self.dx += 5
+            self.dx += 4
 
         if keys[pygame.K_LEFT]:
             if self.player_is_rolling:
