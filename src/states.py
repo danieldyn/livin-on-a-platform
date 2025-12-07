@@ -338,6 +338,7 @@ class Gameplay(State):
         world_level_09 = create_world("../assets/worlds/world9.txt")
         world_level_10 = create_world("../assets/worlds/world10.txt")
         world_level_11 = create_world("../assets/worlds/world11.txt")
+        final_world = create_world("../assets/worlds/final_world.txt")
         secret_world = create_world("../assets/worlds/secret.txt")
         secret_world1 = create_world("../assets/worlds/secret1.txt")
 
@@ -350,10 +351,11 @@ class Gameplay(State):
             ("../assets/backgrounds/sky.jpg", world_level_05, 5, 5 * BLOCK_SIZE, SCREEN_HEIGHT - 11 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_06, 6, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 8 * BLOCK_SIZE),
             ("../assets/backgrounds/sky.jpg", world_level_07, 7, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
-            ("../assets/backgrounds/sky.jpg", world_level_08, 8, SCREEN_WIDTH - 3 * BLOCK_SIZE, SCREEN_HEIGHT - 7 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_09, 8, 7 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_10, 9, 23 * BLOCK_SIZE, SCREEN_HEIGHT - 5 * BLOCK_SIZE),
-            ("../assets/backgrounds/sky.jpg", world_level_11, 10, 3 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE)
+            ("../assets/backgrounds/sky.jpg", world_level_08, 8, 3 * BLOCK_SIZE, SCREEN_HEIGHT - 9 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_09, 8, 2 * BLOCK_SIZE, SCREEN_HEIGHT - 27 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_10, 9, 15 * BLOCK_SIZE, SCREEN_HEIGHT - 8 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", world_level_11, 10, 3 * BLOCK_SIZE, SCREEN_HEIGHT - 13 * BLOCK_SIZE),
+            ("../assets/backgrounds/sky.jpg", final_world, 10, 2 * BLOCK_SIZE, SCREEN_HEIGHT - 6 * BLOCK_SIZE)
         ]
         self.secret_world_sequence = [
             # The last level is only accesible by interacting with the All Powerful Acorn
@@ -394,7 +396,10 @@ class Gameplay(State):
         If it finishes, transition to the next level or back to the main menu via buttons.
         """
         if self.current_level.running:
-            self.current_level.run_level()
+            if self.level_idx == len(self.level_list) - 1: # last level
+                self.current_level.run_level(True)
+            else:
+                self.current_level.run_level()
             if self.current_level.player.touched_acorn == True:
                 self.start_secret = True
         else:

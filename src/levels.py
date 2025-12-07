@@ -3,7 +3,7 @@ A method that handles the game's levels.
 """
 import pygame
 import storage
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER, BLOCK_SIZE
 from settings import screen, mixer, highscores
 from character import Player
 from worlds import reset_world
@@ -42,7 +42,7 @@ class Level(SoundAssets):
         self.start_x = start_x
         self.start_y = start_y
         self.player = Player(start_x, start_y)
-        self.player2 = Player(start_x + 32, start_y + 32)
+        self.player2 = Player(SCREEN_WIDTH - 14 * BLOCK_SIZE, SCREEN_HEIGHT - 9 * BLOCK_SIZE)
 
     def reset(self):
         """
@@ -70,13 +70,13 @@ class Level(SoundAssets):
         screen.blit(self.bg_surf, (0, 0))
         # self.world.draw()
 
-    def display_player(self, player_can_move = True, single_player = True):
+    def display_player(self, first_player_can_move = True, single_player = True, second_player_can_move = False):
         """
         A wrapper method that simply updates the player.
         """
-        self.player.update(self.world, player_can_move)
+        self.player.update(self.world, first_player_can_move)
         if not single_player:
-            self.player2.update(self.world, player_can_move)
+            self.player2.update(self.world, second_player_can_move)
 
     def display_objects(self):
         """
@@ -220,7 +220,7 @@ class Level(SoundAssets):
         SoundAssets.victory.play()
         self.state = "completed"
 
-    def run_level(self):
+    def run_level(self, final_level = False):
         """
         A method that controls a level's outcomes and constantly updates it while playing.
         """
@@ -229,7 +229,10 @@ class Level(SoundAssets):
         if self.state == "playing":
             self.display_world() # layer 1
             self.display_objects() # layer 2
-            self.display_player() # layer 3
+            if final_level == False:
+                self.display_player() # layer 3
+            else:
+                self.display_player(True, False) # there are 2 knights in the final level (one is not responsive)
 
             if not self.player.player_is_alive:
                 self.state = "dead"
