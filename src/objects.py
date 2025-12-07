@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import pygame
 from sounds import SoundAssets
 from settings import screen, OBJECT_IMAGE_INCREMENT
+import random
 
 class Object(ABC):
     """
@@ -101,7 +102,23 @@ class DangerousObject(Object, SoundAssets):
         self.object_movement_range = (x - dx, x + dx)
         self.dx = dx
         self.direction = 1
+        if dx != 0:  # animation delay only for movable objects
+            self.animation_delay = random.uniform(0, 2) * 1000
+        else:
+            self.animation_delay = 0
+        
+        self.animation_start_time = pygame.time.get_ticks()
+        self.delay_finished = False
+
     def object_animation(self):
+        # check for animation delay
+        if not self.delay_finished:
+            if pygame.time.get_ticks() - self.animation_start_time < self.animation_delay:
+                obj_surface = self.object_img_list[int(self.object_img_index)][0]
+                screen.blit(obj_surface, self.obj_rect)
+                return  # don't animate yet
+            self.delay_finished = True
+
         self.object_img_index += OBJECT_IMAGE_INCREMENT
         if self.object_img_index >= len(self.object_img_list):
             self.object_img_index = 0
@@ -109,7 +126,7 @@ class DangerousObject(Object, SoundAssets):
         obj_surface = self.object_img_list[int(self.object_img_index)][0]
 
         if self.dx == 0:
-            # default mode -> imovable
+            # default mode -> immovable
             screen.blit(obj_surface, self.obj_rect)
         else:
             # specific mode -> movable
@@ -122,7 +139,7 @@ class DangerousObject(Object, SoundAssets):
                 obj_surface = pygame.transform.flip(obj_surface, True, False).convert_alpha()
             screen.blit(obj_surface, self.obj_rect)
 
-class StaticObject(Object): # it cannot be moved or crossed (i.e. block)
+class StaticObject(Object):
     """
     A class that implements an object that cannot be moved or crossed.
     Player collisions with these objects will not be tested.

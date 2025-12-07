@@ -43,6 +43,7 @@ class Game():
         A method that loads assets that are used across multiple states.
         """
         self.text_font = pygame.font.Font('../assets/fonts/PixelOperator8.ttf', 20)
+        self.title_font = pygame.font.Font('../assets/fonts/PixelOperator8.ttf', 40)
 
     def handle_events(self):
         """

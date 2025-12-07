@@ -14,3 +14,9 @@
 - `d` <=> heart
 - `e` <=> mushroom
 - `f` <=> flower
+- `g` <=> underground tile 1
+- `h` <=> underground tile 2
+- `i` <=> stone block
+- `j` <=> cobblestone tile 1
+- `k` <=> cobblestone tile 2
+- 's` <=> secret acorn

@@ -95,6 +95,18 @@ class MainMenu(State):
         self.level_instance.display_objects()
         self.level_instance.display_player(False, False)
 
+        # Display game name (fancy)
+        msg = "Livin' on a Platform"
+        font = self.game.title_font
+        x, y = 270, 300
+        # Shadow
+        screen.blit(font.render(msg, True, (50, 50, 50)), (x + 3, y + 3))
+        # Outline (4 directions)
+        for ox, oy in [(-2,0), (2,0), (0,-2), (0,2)]:
+            screen.blit(font.render(msg, True, (255, 255, 255)), (x + ox, y + oy))
+        # Main text
+        screen.blit(font.render(msg, True, BLACK), (x, y))
+
         # Display hints using hardcoded values to fit well in the chosen background
         y = 500
         for line in play_hint:

@@ -93,6 +93,12 @@ class Player(SoundAssets):
 
         # horizontal collisions and movement
         self.player_rect.x += self.dx
+        # prevent going off the screen horizontally
+        if self.player_rect.left < 0:
+            self.player_rect.left = 0
+        if self.player_rect.right > SCREEN_WIDTH:
+            self.player_rect.right = SCREEN_WIDTH
+
         start_col = self.player_rect.left // BLOCK_SIZE
         end_col = (self.player_rect.right - 1) // BLOCK_SIZE
         start_row = self.player_rect.top // BLOCK_SIZE
