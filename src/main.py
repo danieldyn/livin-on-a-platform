@@ -2,10 +2,14 @@
 Main entry point for the platformer game.
 Initialises Pygame, handles menu logic and states using two fundamental classes.
 """
+
+import asyncio
+
 import pygame
+
 import storage
-from settings import screen, FPS
-from states import MainMenu, HelpScreen, StoryScreen, Gameplay, FeatsScreen
+from settings import FPS, screen
+from states import FeatsScreen, Gameplay, HelpScreen, MainMenu, StoryScreen
 
 class Game():
     """
@@ -13,7 +17,6 @@ class Game():
     Manages the game loop, states, and shared resources.
     """
     def __init__(self):
-        pygame.init()
         self.screen = screen # Use the screen from settings
         self.clock = pygame.time.Clock()
         self.running = True
@@ -42,8 +45,8 @@ class Game():
         """
         A method that loads assets that are used across multiple states.
         """
-        self.text_font = pygame.font.Font('../assets/fonts/PixelOperator8.ttf', 20)
-        self.title_font = pygame.font.Font('../assets/fonts/PixelOperator8.ttf', 40)
+        self.text_font = pygame.font.Font("assets/fonts/PixelOperator8.ttf", 20)
+        self.title_font = pygame.font.Font("assets/fonts/PixelOperator8.ttf", 40)
 
     def handle_events(self):
         """
@@ -70,7 +73,7 @@ class Game():
         self.state = self.states[self.state_name]
         self.state.startup()
 
-    def run(self):
+    async def run(self):
         """
         A method that implements the main game loop.
         Will be very simplistic because of other methods.
@@ -79,9 +82,14 @@ class Game():
             self.handle_events()
             self.update()
             self.clock.tick(FPS)
+            await asyncio.sleep(0)
+
 
 # Main execution
-if __name__ == "__main__":
+async def main():
     game = Game()
-    game.run()
+    await game.run()
     pygame.quit()
+
+if __name__ == "__main__":
+    asyncio.run(main())

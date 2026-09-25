@@ -2,18 +2,20 @@
 General usage parameters and settings for the game.
 This module is meant to be shared by others, avoiding cross-import errors.
 """
-from pygame import display
-from pygame import mixer
+
+import pygame
+
 import storage
+
 # import 'sub'classes
 
 # constants
-BLOCK_SIZE = 16 # px
+BLOCK_SIZE = 16  # px
 SCREEN_WIDTH = 72 * BLOCK_SIZE
 SCREEN_HEIGHT = 54 * BLOCK_SIZE
 FPS = 60
 RUNNING_IMAGE_INCREMENT = 0.1
-ROLLING_IMAGE_INCREMENT = 0.15 # faster rolling animation
+ROLLING_IMAGE_INCREMENT = 0.15  # faster rolling animation
 IDLE_IMAGE_INCREMENT = 0.1
 OBJECT_IMAGE_INCREMENT = 0.1
 BUTTON_IMAGE_INCREMENT = 0.35
@@ -22,15 +24,16 @@ WHITE = (255, 255, 255)
 BLACK = (64, 64, 64)
 
 # screen setup
-screen = display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # mixer setup
+mixer = pygame.mixer
 mixer.init()
 
 # background music for levels
-mixer.music.load('../assets/music/game_level_music.wav')
+mixer.music.load("assets/music/game_level_music.ogg")
 volume = mixer.music.get_volume()
-mixer.music.set_volume(volume - 0.5) # test option
+mixer.music.set_volume(volume - 0.5)  # test option
 
 # persistent JSON files
 highscores = storage.load_highscores()
@@ -54,7 +57,7 @@ instructions = [
     "Press Enter to collect Chests and touch the Flag.",
     "Left click on buttons to interact with them.",
     "",
-    "Find out more ------------>"
+    "Find out more ------------>",
 ]
 
 features = [
@@ -74,7 +77,7 @@ features = [
     "launch the level after the last completed one, if any. You",
     "can freely reset and start fresh using the Reset button.",
     "",
-    "Ready to play now? ------->"
+    "Ready to play now? ------->",
 ]
 
 story = [
@@ -96,7 +99,7 @@ story = [
     "kingdom's core to save him.",
     "The true fight remains here.",
     "",
-    "Ready to play now? --------------->"
+    "Ready to play now? --------------->",
 ]
 
 play_hint = [
@@ -113,7 +116,7 @@ help_hint = [
     "          I",
     "          I",
     "          I",
-    "          V"
+    "          V",
 ]
 
 story_hint = [
@@ -129,11 +132,11 @@ feats_hint = [
     "                               ^",
     "                               I",
     "                               I",
-    "Check out your records!"
+    "Check out your records!",
 ]
 
 reset_hint = [
     "                                             ^",
     "                                             |",
-    "Want to reset your save? -----"
+    "Want to reset your save? -----",
 ]

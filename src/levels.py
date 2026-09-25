@@ -1,15 +1,25 @@
 """
 A method that handles the game's levels.
 """
+
 import pygame
+
 import storage
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, COIN_MULTIPLIER, BLOCK_SIZE
-from settings import screen, mixer, highscores
-from character import Player
-from worlds import reset_world
 from buttons import Button
+from character import Player
 from objects import Object
+from settings import (
+    BLOCK_SIZE,
+    COIN_MULTIPLIER,
+    FPS,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    highscores,
+    mixer,
+    screen,
+)
 from sounds import SoundAssets
+from worlds import reset_world
 
 restart_button = Button(400, 600, "Retry")
 restart_button.get_img("button_images_01", 5, "png")
@@ -29,7 +39,7 @@ class Level(SoundAssets):
     def __init__(self, bg_img, world, idx, start_x, start_y):
         self.running = True
         self.idx = idx
-        bg_surf = pygame.image.load(bg_img)
+        bg_surf = pygame.image.load(bg_img).convert()
         self.bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.world = world
         self.clock = pygame.time.Clock()
@@ -42,7 +52,33 @@ class Level(SoundAssets):
         self.start_x = start_x
         self.start_y = start_y
         self.player = Player(start_x, start_y)
-        self.player2 = Player(SCREEN_WIDTH - 14 * BLOCK_SIZE, SCREEN_HEIGHT - 9 * BLOCK_SIZE)
+        self.player2 = Player(
+            SCREEN_WIDTH - 14 * BLOCK_SIZE, SCREEN_HEIGHT - 9 * BLOCK_SIZE
+        )
+
+        # Pre-load fonts
+        self.score_font = pygame.font.Font("assets/fonts/PixelOperator8-Bold.ttf", 25)
+        self.time_font = pygame.font.Font("assets/fonts/PixelOperator8-Bold.ttf", 25)
+        self.ending_font = pygame.font.Font("assets/fonts/PixelOperator8-Bold.ttf", 45)
+
+        # Pre-load and scale hearts
+        original_heart = pygame.image.load("assets/Heart/heartanim1.png").convert_alpha()
+        self.heart_full = pygame.transform.scale(original_heart, (40, 40))
+        self.heart_empty = self.heart_full.copy()
+        self.heart_empty.set_alpha(150) # make the heart greyed out
+
+        # Pre-load ending background
+        ending_bg = pygame.image.load("assets/backgrounds/ending.jpg").convert()
+        self.ending_bg_surf = pygame.transform.scale(ending_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        # HUD surface caches to avoid re-rendering fonts when values haven't changed
+        self._cached_score = -1
+        self._score_surf = None
+        self._score_rect = None
+
+        self._cached_time_seconds = -1
+        self._time_surf = None
+        self._time_rect = None
 
     def reset(self):
         """
@@ -62,6 +98,10 @@ class Level(SoundAssets):
         next_button.reset()
         for obj in self.world.draw_list:
             obj.object_shown = True
+
+        # Invalidate text caches on reset
+        self._cached_score = -1
+        self._cached_time_seconds = -1
 
     def display_world(self):
         """
@@ -96,41 +136,38 @@ class Level(SoundAssets):
         """
         A method that displays the score in the top right corner.
         """
-        score_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 25)
         score = self.player.coins_collected * 10
-        score_surf = score_font.render(f'Score: {score}', True, (64, 64, 64))
-        score_rect = score_surf.get_rect(center = (SCREEN_WIDTH - 150, 50))
-        screen.blit(score_surf, score_rect)
+        if score != self._cached_score:
+            self._cached_score = score
+            self._score_surf = self.score_font.render(f"Score: {score}", True, (64, 64, 64))
+            self._score_rect = self._score_surf.get_rect(center = (SCREEN_WIDTH - 150, 50))
+        screen.blit(self._score_surf, self._score_rect)
 
     def display_time(self):
         """
         A method that displays the time in the top right corner.
         """
-        time_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 25)
         time = pygame.time.get_ticks() - self.start_time
-        time = (int)(time / 1000) # transform to seconds
-        minutes = (int)(time / 60)
-        seconds = (int)(time % 60)
+        time_seconds = int(time / 1000) # transform to seconds
 
-        time_surf = time_font.render(f'Time: {minutes:02}:{seconds:02}', True, (64, 64, 64))
-        time_rect = time_surf.get_rect(center = (SCREEN_WIDTH - 150, 100))
-        screen.blit(time_surf, time_rect)
+        if time_seconds != self._cached_time_seconds:
+            self._cached_time_seconds = time_seconds
+            minutes = int(time_seconds / 60)
+            seconds = int(time_seconds % 60)
+            self._time_surf = self.time_font.render(f"Time: {minutes:02}:{seconds:02}", True, (64, 64, 64))
+            self._time_rect = self._time_surf.get_rect(center = (SCREEN_WIDTH - 150, 100))
+        screen.blit(self._time_surf, self._time_rect)
 
     def display_lives(self):
         """
         A method that displays the total amount of lives in the top left corner.
         """
-        original_heart = pygame.image.load('../assets/Heart/heartanim1.png')
-        heart_full = pygame.transform.scale(original_heart, (40, 40))
-        heart_empty = heart_full.copy()
-        heart_empty.set_alpha(150) # make the heart greyed out
-
-        (x, y) = (30, 30)
+        x, y = (30, 30)
         for i in range(3):
             if i < self.player.lives:
-                screen.blit(heart_full, (x, y))
+                screen.blit(self.heart_full, (x, y))
             else:
-                screen.blit(heart_empty, (x, y))
+                screen.blit(self.heart_empty, (x, y))
             x += 50
 
     def display_ending(self):
@@ -138,7 +175,6 @@ class Level(SoundAssets):
         A method that displays the ending menu on the entire screen.
         Depending on the states "fallen" and "completed", a different menu is displayed.
         """
-        ending_font = pygame.font.Font('../assets/fonts/PixelOperator8-Bold.ttf', 45)
         score = self.player.coins_collected * COIN_MULTIPLIER
         time = (int)(self.ending_time / 1000) # transform to seconds
         minutes = time // 60
@@ -146,24 +182,20 @@ class Level(SoundAssets):
         score = score - minutes // 60 - seconds # adjust score depending on the time taken
         score = max(score, 0) # we don't accept negative scores here
 
-        bg_surf = pygame.image.load('../assets/backgrounds/ending.jpg')
-        bg_surf = pygame.transform.scale(bg_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
         if self.state == "fallen":
-            ending_surf = ending_font.render(f'You have lost!', True, (64, 64, 64))
-
+            ending_surf = self.ending_font.render("You have lost!", True, (64, 64, 64))
         else:
-            ending_surf = ending_font.render(f'You have won!', True, (64, 64, 64))
+            ending_surf = self.ending_font.render("You have won!", True, (64, 64, 64))
 
         ending_rect = ending_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60))
 
-        score_surf = ending_font.render(f'Score: {score}', True, (64, 64, 64))
+        score_surf = self.ending_font.render(f"Score: {score}", True, (64, 64, 64))
         score_rect = score_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
-        time_surf = ending_font.render(f'Time: {minutes:02}:{seconds:02}', True, (64, 64, 64))
+        time_surf = self.ending_font.render(f"Time: {minutes:02}:{seconds:02}", True, (64, 64, 64))
         time_rect = time_surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60))
 
-        screen.blit(bg_surf, (0, 0))
+        screen.blit(self.ending_bg_surf, (0, 0))
         screen.blit(ending_surf, ending_rect)
         screen.blit(score_surf, score_rect)
         screen.blit(time_surf, time_rect)
